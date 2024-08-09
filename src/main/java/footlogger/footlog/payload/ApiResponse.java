@@ -3,6 +3,7 @@ package footlogger.footlog.payload;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import footlogger.footlog.payload.code.status.ErrorStatus;
 import footlogger.footlog.payload.code.status.SuccessStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +23,7 @@ public class ApiResponse<T> {
         return new ApiResponse<>(true, SuccessStatus._OK.getCode(), SuccessStatus._OK.getMessage(), result);
     }
 
-    public static <T> ApiResponse<T> onFailure(String code, String message, T data) {
-        return new ApiResponse<>(false, code, message, data);
+    public static <T> ApiResponse<T> onFailure(ErrorStatus errorStatus, T data) {
+        return new ApiResponse<>(false, errorStatus.getReason().getCode(), errorStatus.getReason().getMessage(), data);
     }
 }
