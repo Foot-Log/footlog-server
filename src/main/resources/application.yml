@@ -23,3 +23,8 @@ springdoc:
     groups-order: DESC
     tags-sorter: alpha
     operations-sorter: method
+
+jwt:
+  secret: ${secret_key}
+  accessTokenValidity: 7200000 # 2 hour
+  refreshTokenValidity: 604800000 # 1 week
