@@ -11,4 +11,8 @@ public class JWTProperties {
     private String secret;
     private Long accessTokenValidity;
     private Long refreshTokenValidity;
+    private String clientId;
+    private String redirectUri;
+    private String tokenUri;
+    private String userInfoUri;
 }
