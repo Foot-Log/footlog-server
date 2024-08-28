@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Log {
+public class CheckCourse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "log_id")
+    @Column(name = "checkcourse_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -25,6 +25,6 @@ public class Log {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String logContent;
-    private String photos;
+    private boolean isSaved;
+
 }

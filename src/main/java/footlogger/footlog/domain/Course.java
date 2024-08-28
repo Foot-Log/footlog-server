@@ -28,6 +28,10 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<Log> logList = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private List<CheckCourse> checkCourseList = new ArrayList<>();
+
 
     private String location;
     private String name;

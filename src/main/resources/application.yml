@@ -26,8 +26,8 @@ springdoc:
 
 jwt:
   secret: ${secret_key}
-  accessTokenValidity: 7200000 # 2 hour
-  refreshTokenValidity: 604800000 # 1 week
+  access-token-validity: 7200000 # 2 hour
+  refresh-token-validity: 86400000 # 1 week
 
 kakao:
   client-id: ${REST_API_KEY}

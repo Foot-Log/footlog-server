@@ -1,9 +1,13 @@
 package footlogger.footlog.service;
 
+import footlogger.footlog.converter.UserConverter;
 import footlogger.footlog.domain.User;
+import footlogger.footlog.domain.jwt.JWTUtil;
 import footlogger.footlog.repository.UserRepository;
+import footlogger.footlog.web.dto.response.UserResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -11,12 +15,23 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final JWTUtil jwtUtil;
 
-    public Optional<User> findByProviderId(Long kakaoId) {
+    public Optional<User> findByKakaoId(Long kakaoId) {
         return userRepository.findByKakaoId(kakaoId);
     }
 
     public void save(User user){
         userRepository.save(user);
+    }
+
+    @Transactional
+    public UserResponseDto.UserInfoDto getUserInfo(String token) {
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        User user = userRepository.findByKakaoId(userId).orElseThrow(() ->
+                new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        return UserConverter.toUserInfo(user);
+
     }
 }

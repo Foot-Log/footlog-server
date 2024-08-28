@@ -25,6 +25,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Log> logList = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<CheckCourse> checkCourseList = new ArrayList<>();
+
     private String email;
     private Long kakaoId;
     private String nickname;
