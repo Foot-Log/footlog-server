@@ -1,5 +1,7 @@
 package footlogger.footlog.domain.jwt;
 
+import footlogger.footlog.domain.User;
+import footlogger.footlog.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Component;
 public class JWTUtil {
     private final TokenProvider tokenProvider;
     private final JWTProperties jwtProperties;
+    private final UserRepository userRepository;
 
     public String createAccessToken(String email) {
         return tokenProvider.createToken(email, jwtProperties.getAccessTokenValidity());
@@ -21,5 +24,10 @@ public class JWTUtil {
         return tokenProvider.getEmailFromToken(token);
     }
 
-    // public String getUserIdFromToken(String token) 추후 구현
+    public Long getUserIdFromToken(String token) {
+        String email = getEmailFromToken(token);
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+                new IllegalArgumentException("존재하지 않는 계정입니다."));
+        return user.getKakaoId();
+    }
 }

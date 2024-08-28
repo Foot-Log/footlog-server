@@ -82,12 +82,13 @@ public class KakaoService {
         String profileImg = (String) ((Map<String, Object>) userInfo.get("properties")).get("profile_image");
 
         // DB에서 사용자 정보를 확인
-        Optional<User> optionalUser = userService.findByProviderId(kakaoId);
+        Optional<User> optionalUser = userService.findByKakaoId(kakaoId);
         User user;
 
         if(optionalUser.isPresent()) {
             // 사용자가 존재하면 그 사용자 정보를 가져옴
             user = optionalUser.get();
+
         }
          else {
             // 사용자가 없으면 회원가입 처리
@@ -97,13 +98,12 @@ public class KakaoService {
                      .nickname(nickname)
                      .profileImg(profileImg)
                      .build();
-             userService.save(user);
         }
 
          String accessTokenJwt = jwtUtil.createAccessToken(email);
          String refreshTokenJwt = jwtUtil.createRefreshToken(email);
 
-         user.setRefreshToken(refreshTokenJwt);
+        user.setRefreshToken(refreshTokenJwt);
          userService.save(user);
 
          return user;

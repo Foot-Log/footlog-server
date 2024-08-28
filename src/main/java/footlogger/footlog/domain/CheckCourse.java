@@ -25,4 +25,6 @@ public class CheckCourse {
     @JoinColumn(name = "user_id")
     private User user;
 
+    private boolean isSaved;
+
 }
