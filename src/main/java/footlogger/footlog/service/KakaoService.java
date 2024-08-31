@@ -25,25 +25,28 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class KakaoService {
     private final UserService userService;
-    private final String clientId;
-    private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
-    private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
 
+    @Value("${kakao.client_id}")
+    private String clientId;
 
-    @Autowired
-    public KakaoService(@Value("${kakao.client_id}") String clientId, UserService userService) {
-        this.clientId = clientId;
-        this.userService = userService;
-    }
+    @Value("${kakao.redirect_uri}")
+    private String redirectUri;
+
+    @Value("${kakao.token_uri}")
+    private String tokenUri;
+
+    @Value("${kakao.user_info_uri}")
+    private String userInfoUri;
+
 
     public KakaoTokenResponseDto getAccessTokenFromKakao(String code) {
         try {
-            KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
+            KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(tokenUri).post()
                     .uri(uriBuilder -> uriBuilder
                             .path("/oauth/token")
                             .queryParam("grant_type", "authorization_code")
                             .queryParam("client_id", clientId)
-                            .queryParam("redirect_uri", "http://localhost:3000/user/kakao/callback")
+                            .queryParam("redirect_uri", redirectUri)
                             .queryParam("code", code)
                             .build())
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -59,11 +62,6 @@ public class KakaoService {
                     .bodyToMono(KakaoTokenResponseDto.class)
                     .block();
 
-            log.info(" [Kakao Service] Access Token ------> {}", kakaoTokenResponseDto.getAccessToken());
-            log.info(" [Kakao Service] Refresh Token ------> {}", kakaoTokenResponseDto.getRefreshToken());
-            log.info(" [Kakao Service] Id Token ------> {}", kakaoTokenResponseDto.getIdToken());
-            log.info(" [Kakao Service] Scope ------> {}", kakaoTokenResponseDto.getScope());
-
             return kakaoTokenResponseDto;
         } catch (Exception e) {
             log.error("Error occurred while getting access token from Kakao: ", e);
@@ -72,7 +70,7 @@ public class KakaoService {
     }
     public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
 
-        KakaoUserInfoResponseDto userInfo = WebClient.create(KAUTH_USER_URL_HOST)
+        KakaoUserInfoResponseDto userInfo = WebClient.create(userInfoUri)
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
@@ -81,16 +79,10 @@ public class KakaoService {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken) // access token 인가
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
                 .retrieve()
-                //TODO : Custom Exception
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
                 .bodyToMono(KakaoUserInfoResponseDto.class)
                 .block();
-
-        log.info("[ Kakao Service ] Auth ID ---> {} ", userInfo.getId());
-        log.info("[ Kakao Service ] NickName ---> {} ", userInfo.getKakaoAccount().getProfile().getNickName());
-        log.info("[ Kakao Service ] ProfileImageUrl ---> {} ", userInfo.getKakaoAccount().getProfile().getProfileImageUrl());
-
 
         return userInfo;
     }

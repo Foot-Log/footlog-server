@@ -35,5 +35,5 @@ jwt:
 kakao:
   client_id: ${REST_API_KEY}
   redirect_uri: ${REDIRECT_URI}
-  token-uri: "https://kauth.kakao.com/oauth/token" # 토큰 발급 요청 URI
-  user-info-uri: "https://kapi.kakao.com/v2/user/me" # 사용자 정보 요청 URI
+  token_uri: "https://kauth.kakao.com" # 토큰 발급 요청 URI
+  user_info_uri: "https://kapi.kakao.com" # 사용자 정보 요청 URI
