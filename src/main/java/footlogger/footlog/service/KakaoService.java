@@ -22,19 +22,21 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-
+@RequiredArgsConstructor
 public class KakaoService {
-
+    private final UserService userService;
     private final String clientId;
     private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
     private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
 
+
     @Autowired
-    public KakaoService(@Value("${kakao.client_id}") String clientId) {
+    public KakaoService(@Value("${kakao.client_id}") String clientId, UserService userService) {
         this.clientId = clientId;
+        this.userService = userService;
     }
 
-    public String getAccessTokenFromKakao(String code) {
+    public KakaoTokenResponseDto getAccessTokenFromKakao(String code) {
         try {
             KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
                     .uri(uriBuilder -> uriBuilder
@@ -62,7 +64,7 @@ public class KakaoService {
             log.info(" [Kakao Service] Id Token ------> {}", kakaoTokenResponseDto.getIdToken());
             log.info(" [Kakao Service] Scope ------> {}", kakaoTokenResponseDto.getScope());
 
-            return kakaoTokenResponseDto.getAccessToken();
+            return kakaoTokenResponseDto;
         } catch (Exception e) {
             log.error("Error occurred while getting access token from Kakao: ", e);
             throw new RuntimeException("Failed to retrieve access token from Kakao", e);
@@ -89,7 +91,35 @@ public class KakaoService {
         log.info("[ Kakao Service ] NickName ---> {} ", userInfo.getKakaoAccount().getProfile().getNickName());
         log.info("[ Kakao Service ] ProfileImageUrl ---> {} ", userInfo.getKakaoAccount().getProfile().getProfileImageUrl());
 
+
         return userInfo;
+    }
+
+    // 사용자 정보로 회원가입 처리
+    public void handleUserRegistration(KakaoUserInfoResponseDto userInfo, KakaoTokenResponseDto kakaoTokenResponseDto) {
+        Long kakaoId = userInfo.getId();
+        Optional<User> existingUser = userService.findByKakaoId(kakaoId);
+
+        if (existingUser.isEmpty()) { // 유저가 존재하지 않으면 회원가입 처리
+            User newUser = User.builder()
+                    .kakaoId(kakaoId)
+                    .nickname(userInfo.getKakaoAccount().getProfile().getNickName())
+                    .profileImg(userInfo.getKakaoAccount().getProfile().getProfileImageUrl())
+                    .email(userInfo.getKakaoAccount().getEmail())
+                    .level("Newbie")
+                    .stampCount(0L)
+                    .accessToken(kakaoTokenResponseDto.getAccessToken())  // 액세스 토큰 저장
+                    .refreshToken(kakaoTokenResponseDto.getRefreshToken())
+                    .build();
+
+            userService.save(newUser);
+        }else {
+            // 이미 존재하는 경우 토큰을 업데이트
+            User user = existingUser.get();
+            user.setAccessToken(kakaoTokenResponseDto.getAccessToken());
+            user.setRefreshToken(kakaoTokenResponseDto.getRefreshToken());
+            userService.save(user); // 갱신된 정보 저장
+        }
     }
 }
 

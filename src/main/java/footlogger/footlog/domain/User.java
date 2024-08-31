@@ -39,4 +39,6 @@ public class User {
 
     @Setter
     private String refreshToken;
+    @Setter
+    private String accessToken;
 }
