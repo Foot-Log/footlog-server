@@ -3,6 +3,7 @@ package footlogger.footlog.web.controller;
 import footlogger.footlog.domain.User;
 import footlogger.footlog.service.KakaoService;
 import footlogger.footlog.service.UserService;
+import footlogger.footlog.web.dto.response.KakaoUserInfoResponseDto;
 import footlogger.footlog.web.dto.response.UserResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ public class UserController {
     public ResponseEntity<?> callback(@RequestParam("code") String code) throws IOException {
         try {
             String accessToken = kakaoService.getAccessTokenFromKakao(code);
+            KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken);
             return new ResponseEntity<>(accessToken, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Error during Kakao callback: ", e);

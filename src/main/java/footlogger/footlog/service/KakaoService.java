@@ -4,6 +4,7 @@ import ch.qos.logback.core.joran.util.beans.BeanDescriptionFactory;
 import footlogger.footlog.domain.User;
 import footlogger.footlog.domain.jwt.JWTUtil;
 import footlogger.footlog.web.dto.response.KakaoTokenResponseDto;
+import footlogger.footlog.web.dto.response.KakaoUserInfoResponseDto;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +67,29 @@ public class KakaoService {
             log.error("Error occurred while getting access token from Kakao: ", e);
             throw new RuntimeException("Failed to retrieve access token from Kakao", e);
         }
+    }
+    public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
+
+        KakaoUserInfoResponseDto userInfo = WebClient.create(KAUTH_USER_URL_HOST)
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .scheme("https")
+                        .path("/v2/user/me")
+                        .build(true))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken) // access token 인가
+                .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
+                .retrieve()
+                //TODO : Custom Exception
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
+                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
+                .bodyToMono(KakaoUserInfoResponseDto.class)
+                .block();
+
+        log.info("[ Kakao Service ] Auth ID ---> {} ", userInfo.getId());
+        log.info("[ Kakao Service ] NickName ---> {} ", userInfo.getKakaoAccount().getProfile().getNickName());
+        log.info("[ Kakao Service ] ProfileImageUrl ---> {} ", userInfo.getKakaoAccount().getProfile().getProfileImageUrl());
+
+        return userInfo;
     }
 }
 
