@@ -47,6 +47,5 @@ public class UserController {
     public UserResponseDto.UserInfoDto getUserInfo(@RequestHeader("Authorization") String token) {
         String tokenWithoutBearer = token.substring(7);
         return userService.getUserInfo(tokenWithoutBearer);
-
     }
 }

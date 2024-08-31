@@ -27,10 +27,8 @@ public class UserService {
 
     @Transactional
     public UserResponseDto.UserInfoDto getUserInfo(String token) {
-        Long userId = jwtUtil.getUserIdFromToken(token);
-        User user = userRepository.findByKakaoId(userId).orElseThrow(() ->
-                new IllegalArgumentException("유저를 찾을 수 없습니다."));
-
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
         return UserConverter.toUserInfo(user);
 
     }

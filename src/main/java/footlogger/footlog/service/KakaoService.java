@@ -98,7 +98,7 @@ public class KakaoService {
                     .nickname(userInfo.getKakaoAccount().getProfile().getNickName())
                     .profileImg(userInfo.getKakaoAccount().getProfile().getProfileImageUrl())
                     .email(userInfo.getKakaoAccount().getEmail())
-                    .level("Newbie")
+                    .level("새싹")
                     .stampCount(0L)
                     .accessToken(kakaoTokenResponseDto.getAccessToken())  // 액세스 토큰 저장
                     .refreshToken(kakaoTokenResponseDto.getRefreshToken())
