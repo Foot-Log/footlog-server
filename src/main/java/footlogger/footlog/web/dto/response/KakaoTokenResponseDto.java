@@ -2,6 +2,8 @@ package footlogger.footlog.web.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,4 +25,5 @@ public class KakaoTokenResponseDto {
     public Integer refreshTokenExpiresIn;
     @JsonProperty("scope")
     public String scope;
+
 }

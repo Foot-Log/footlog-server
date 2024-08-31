@@ -33,10 +33,11 @@ public class UserController {
             KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(kakaoTokenResponseDto.getAccessToken());
             kakaoService.handleUserRegistration(userInfo, kakaoTokenResponseDto);
 
-            return new ResponseEntity<>(ApiResponse.onSuccess(Map.of(
-                    "accessToken", kakaoTokenResponseDto.getAccessToken(),
-                    "refreshToken", kakaoTokenResponseDto.getAccessToken()
-            )), HttpStatus.OK);
+            UserResponseDto.LoginResultDto loginResultDto = UserResponseDto.LoginResultDto.builder()
+                    .accessToken(kakaoTokenResponseDto.getAccessToken())
+                    .refreshToken(kakaoTokenResponseDto.getAccessToken())
+                    .build();
+            return new ResponseEntity<>(ApiResponse.onSuccess(loginResultDto), HttpStatus.OK);
         } catch (Exception e) {
             log.error("Error during Kakao callback: ", e);
             return new ResponseEntity<>(ApiResponse.onFailure(_INTERNAL_SERVER_ERROR, null), HttpStatus.INTERNAL_SERVER_ERROR);
