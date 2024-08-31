@@ -11,9 +11,8 @@ public class UserResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginResultDto {
-        private Long id;
-        private String nickname;
-        private String profileImg;
+        private String accessToken;
+        private String refreshToken;
     }
 
     @Builder
