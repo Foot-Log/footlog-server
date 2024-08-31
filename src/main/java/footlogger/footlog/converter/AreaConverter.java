@@ -1,8 +1,13 @@
 package footlogger.footlog.converter;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
+@RequiredArgsConstructor
 public class AreaConverter {
     private static final Map<Integer, String> codeToName = new HashMap<>();
     private static final Map<String, Integer> nameToCode = new HashMap<>();
@@ -31,12 +36,12 @@ public class AreaConverter {
     }
 
     //코드를 지역으로 변환
-    public static Integer getCodeByAreaName(String name) {
+    public Integer getCodeByAreaName(String name) {
         return nameToCode.getOrDefault(name, 0);
     }
 
     //지역을 코드로 변환
-    public static String getAreaNameByCode(Integer code) {
+    public String getAreaNameByCode(Integer code) {
         return codeToName.getOrDefault(code, "Unknown Name");
     }
 }
