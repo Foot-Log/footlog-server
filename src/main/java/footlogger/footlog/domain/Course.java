@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,9 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<CheckCourse> checkCourseList = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private List<CourseImage> images = new ArrayList<>();
 
     private String location;
     private String name;
@@ -43,4 +47,10 @@ public class Course {
     private int areaCode;
     private int sigunguCode;
     private String address;
+
+
+
+    //저장된 수
+    @Formula("(SELECT COUNT(sc.user_id) FROM save_course sc WHERE sc.course_id = course_id)")
+    private int totalSaves;
 }
