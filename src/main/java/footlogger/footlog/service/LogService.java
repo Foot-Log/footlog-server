@@ -12,16 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class LogService {
-    private final JWTUtil jwtUtil;
     private final UserRepository userRepository;
 
     @Transactional
     public LogResponseDto.LogListDto getCompletedList(String token) {
-        Long userId = jwtUtil.getUserIdFromToken(token);
-        User user = userRepository.findByKakaoId(userId).orElseThrow(() ->
-                new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
         return LogConverter.toLogList(user);
-
-
     }
 }
