@@ -18,6 +18,5 @@ public class LogController {
     public LogResponseDto.LogListDto getCompletedList(@RequestHeader("Authorization") String token){
         String tokenWithoutBearer = token.substring(7);
         return logService.getCompletedList(tokenWithoutBearer);
-    }
-
+   }
 }
