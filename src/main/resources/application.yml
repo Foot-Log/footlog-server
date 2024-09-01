@@ -16,6 +16,13 @@ spring:
         use_sql_comments: true
         jdbc:
           time_zone: Asia/Seoul
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+      resolve-lazily: true
+      enabled: true
 #server:
 #  servlet:
 #    context-path: /api
@@ -27,13 +34,24 @@ springdoc:
     tags-sorter: alpha
     operations-sorter: method
 
+cloud:
+  aws:
+    credentials:
+      access-key: ${aws_access}
+      secret-key: ${aws_secret}
+    region:
+      static: ap-northeast-2
+      # 리전 서울로 설정
+    s3:
+      bucket: footlog-bucket
+
 jwt:
   secret: ${secret_key}
   access-token-validity: 7200000 # 2 hour
   refresh-token-validity: 86400000 # 1 week
 
-kakao:
-  client_id: ${REST_API_KEY}
-  redirect_uri: ${REDIRECT_URI}
-  token_uri: "https://kauth.kakao.com" # 토큰 발급 요청 URI
-  user_info_uri: "https://kapi.kakao.com" # 사용자 정보 요청 URI
+#kakao:
+#  client_id: ${REST_API_KEY}
+#  redirect_uri: ${REDIRECT_URI}
+#  token_uri: "https://kauth.kakao.com" # 토큰 발급 요청 URI
+#  user_info_uri: "https://kapi.kakao.com" # 사용자 정보 요청 URI

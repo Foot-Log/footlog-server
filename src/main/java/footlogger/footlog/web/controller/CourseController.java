@@ -3,16 +3,17 @@ package footlogger.footlog.web.controller;
 import footlogger.footlog.domain.Course;
 import footlogger.footlog.payload.ApiResponse;
 import footlogger.footlog.service.CourseService;
+import footlogger.footlog.service.S3ImageService;
 import footlogger.footlog.service.SaveService;
 import footlogger.footlog.web.dto.response.CourseDetailDTO;
 import footlogger.footlog.web.dto.response.CourseResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ import java.util.List;
 public class CourseController {
     private final CourseService courseService;
     private final SaveService saveService;
+    private final S3ImageService s3ImageService;
 
     @Operation(summary = "지역 선택 시 해당 코스 반환")
     @GetMapping("/area/{area_name}")
@@ -56,5 +58,14 @@ public class CourseController {
         courseService.toggleSaveCourse(course_id, user_id);
 
         return ApiResponse.onSuccess(saveService.getSaveStatus(course_id, user_id));
+    }
+
+
+    @Operation( summary = "이미지 업로드 테스트")
+    @PostMapping(value = "/s3/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> s3Upload(@RequestParam(value = "image") MultipartFile image) {
+        String profileImage = s3ImageService.upload(image);
+
+        return ResponseEntity.ok(profileImage);
     }
 }
