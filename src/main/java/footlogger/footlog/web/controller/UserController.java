@@ -39,14 +39,14 @@ public class UserController {
                     .build();
             return new ResponseEntity<>(ApiResponse.onSuccess(loginResultDto), HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Error during Kakao callback: ", e);
             return new ResponseEntity<>(ApiResponse.onFailure(_INTERNAL_SERVER_ERROR, null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/info")
-    public UserResponseDto.UserInfoDto getUserInfo(@RequestHeader("Authorization") String token) {
+    public ApiResponse<UserResponseDto.UserInfoDto> getUserInfo(@RequestHeader("Authorization") String token) {
         String tokenWithoutBearer = token.substring(7);
-        return userService.getUserInfo(tokenWithoutBearer);
+        UserResponseDto.UserInfoDto response = userService.getUserInfo(tokenWithoutBearer);
+        return ApiResponse.onSuccess(response);
     }
 }
