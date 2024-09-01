@@ -49,4 +49,16 @@ public class UserController {
         UserResponseDto.UserInfoDto response = userService.getUserInfo(tokenWithoutBearer);
         return ApiResponse.onSuccess(response);
     }
+
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@RequestHeader("Authorization") String token) {
+        String tokenWithoutBearer = token.substring(7);
+        try {
+            userService.deleteUser(tokenWithoutBearer);
+            return new ResponseEntity<>(ApiResponse.onSuccess(null), HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(ApiResponse.onFailure(_INTERNAL_SERVER_ERROR, null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }
