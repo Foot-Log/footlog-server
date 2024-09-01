@@ -15,7 +15,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final JWTUtil jwtUtil;
 
     public Optional<User> findByKakaoId(Long kakaoId) {
         return userRepository.findByKakaoId(kakaoId);
