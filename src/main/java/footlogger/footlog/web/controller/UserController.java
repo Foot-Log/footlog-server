@@ -27,7 +27,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/kakao/callback")
-    public ResponseEntity<?> callback(@RequestParam("code") String code) {
+    public ResponseEntity<ApiResponse<UserResponseDto.LoginResultDto>> callback(@RequestParam("code") String code) {
         try {
             KakaoTokenResponseDto kakaoTokenResponseDto = kakaoService.getAccessTokenFromKakao(code);
             KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(kakaoTokenResponseDto.getAccessToken());
