@@ -34,6 +34,6 @@ public class LogResponseDto {
         private Long logId;
         private String name;
         private String logContent;
-        private String photos;
+        private List<String> photos;
     }
 }
