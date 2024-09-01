@@ -25,4 +25,15 @@ public class LogResponseDto {
         private Long logId;
         private String name;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LogDetailDto {
+        private Long logId;
+        private String name;
+        private String logContent;
+        private String photos;
+    }
 }

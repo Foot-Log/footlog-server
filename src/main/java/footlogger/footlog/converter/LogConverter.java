@@ -19,4 +19,12 @@ public class LogConverter {
                 .name(log.getCourse().getName())
                 .build();
     }
+    public static LogResponseDto.LogDetailDto toLogDetail(Log log) {
+        return LogResponseDto.LogDetailDto.builder()
+                .logId(log.getId())
+                .name(log.getCourse().getName())
+                .logContent(log.getLogContent())
+                .photos(log.getPhotos())
+                .build();
+    }
 }
