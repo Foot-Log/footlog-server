@@ -3,6 +3,7 @@ package footlogger.footlog.web.controller;
 import footlogger.footlog.domain.Course;
 import footlogger.footlog.payload.ApiResponse;
 import footlogger.footlog.service.CourseService;
+import footlogger.footlog.service.SaveService;
 import footlogger.footlog.web.dto.response.CourseDetailDTO;
 import footlogger.footlog.web.dto.response.CourseResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CourseController {
     private final CourseService courseService;
+    private final SaveService saveService;
 
     @Operation(summary = "지역 선택 시 해당 코스 반환")
     @GetMapping("/area/{area_name}")
@@ -42,5 +45,16 @@ public class CourseController {
         CourseDetailDTO course = courseService.getCourseDetail(course_id, user_id);
 
         return ApiResponse.onSuccess(course);
+    }
+
+    @Operation(summary = "코스 저장 버튼 클릭 시 저장/취소 토글 기능")
+    @PostMapping("/save/{course_id}")
+    public ApiResponse<Boolean> saveCourse(
+            @PathVariable Long course_id
+    ) {
+        Long user_id = 1L;
+        courseService.toggleSaveCourse(course_id, user_id);
+
+        return ApiResponse.onSuccess(saveService.getSaveStatus(course_id, user_id));
     }
 }
