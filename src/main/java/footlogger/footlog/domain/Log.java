@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -26,5 +28,8 @@ public class Log {
     private User user;
 
     private String logContent;
-    private String photos;
+
+    @OneToMany(mappedBy = "log", cascade = CascadeType.ALL)
+    private List<LogPhoto> photos;
+
 }
