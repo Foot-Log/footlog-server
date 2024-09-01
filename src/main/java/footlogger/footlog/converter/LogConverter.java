@@ -1,6 +1,7 @@
 package footlogger.footlog.converter;
 
 import footlogger.footlog.domain.Log;
+import footlogger.footlog.domain.LogPhoto;
 import footlogger.footlog.domain.User;
 import footlogger.footlog.web.dto.response.LogResponseDto;
 
@@ -17,6 +18,15 @@ public class LogConverter {
         return LogResponseDto.LogNameDto.builder()
                 .logId(log.getId())
                 .name(log.getCourse().getName())
+                .build();
+    }
+    public static LogResponseDto.LogDetailDto toLogDetail(Log log) {
+        return LogResponseDto.LogDetailDto.builder()
+                .logId(log.getId())
+                .name(log.getCourse().getName())
+                .logContent(log.getLogContent())
+                .photos(log.getPhotos().stream().map(LogPhoto::getUrl)
+                        .collect(Collectors.toList()))
                 .build();
     }
 }
