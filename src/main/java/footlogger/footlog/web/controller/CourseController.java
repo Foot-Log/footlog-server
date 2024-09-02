@@ -7,6 +7,7 @@ import footlogger.footlog.service.S3ImageService;
 import footlogger.footlog.service.SaveService;
 import footlogger.footlog.web.dto.response.CourseDetailDTO;
 import footlogger.footlog.web.dto.response.CourseResponseDTO;
+import footlogger.footlog.web.dto.response.NaverBlogDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -60,6 +61,13 @@ public class CourseController {
         return ApiResponse.onSuccess(saveService.getSaveStatus(course_id, user_id));
     }
 
+    @Operation(summary = "코스 네이버 포스트 조회")
+    @GetMapping(value = "/post/{course_id}")
+    public ApiResponse<List<NaverBlogDTO>> getNaverBlogPost(
+            @RequestParam(value = "course_id")Long courseId
+    ) {
+        return ApiResponse.onSuccess(courseService.getNaverBlogs(courseId));
+    }
 
     @Operation( summary = "이미지 업로드 테스트")
     @PostMapping(value = "/s3/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
