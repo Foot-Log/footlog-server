@@ -18,8 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Controller
-@RequestMapping("/api/course")
+@RestController
+@RequestMapping("/course")
 @RequiredArgsConstructor
 public class CourseController {
     private final CourseService courseService;
@@ -64,7 +64,7 @@ public class CourseController {
     @Operation(summary = "코스 네이버 포스트 조회")
     @GetMapping(value = "/post/{course_id}")
     public ApiResponse<List<NaverBlogDTO>> getNaverBlogPost(
-            @RequestParam(value = "course_id")Long course_id
+            @PathVariable(value = "course_id")Long course_id
     ) {
         return ApiResponse.onSuccess(courseService.getNaverBlogs(course_id));
     }
@@ -72,7 +72,7 @@ public class CourseController {
     @Operation(summary = "코스 완주하기")
     @PostMapping(value = "/complete/{course_id}")
     public ApiResponse<Long> completeCourse(
-            @RequestParam(value = "course_id") Long course_id
+            @PathVariable(value = "course_id") Long course_id
     ) {
         Long user_id = 1L;
 
