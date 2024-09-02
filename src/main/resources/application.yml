@@ -45,6 +45,10 @@ cloud:
     s3:
       bucket: footlog-bucket
 
+naverApi:
+  clientId: ${NAVER_ClientID}
+  clientSecret: ${NAVER_ClientSecret}
+
 jwt:
   secret: ${secret_key}
   access-token-validity: 7200000 # 2 hour
