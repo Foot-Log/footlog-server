@@ -4,9 +4,11 @@ import footlogger.footlog.converter.AreaConverter;
 import footlogger.footlog.converter.CourseConverter;
 import footlogger.footlog.converter.NaverBlogConverter;
 import footlogger.footlog.domain.Course;
+import footlogger.footlog.domain.Log;
 import footlogger.footlog.domain.SaveCourse;
 import footlogger.footlog.domain.User;
 import footlogger.footlog.repository.CourseRepository;
+import footlogger.footlog.repository.LogRepository;
 import footlogger.footlog.repository.SaveRepository;
 import footlogger.footlog.repository.UserRepository;
 import footlogger.footlog.utils.NaverBlog;
@@ -37,6 +39,7 @@ public class CourseService {
     private final UserRepository userRepository;
     private final NaverBlog naverBlog;
     private final NaverBlogConverter naverBlogConverter;
+    private final LogRepository logRepository;
 
     //지역기반으로 코스를 받아 옴
     public List<CourseResponseDTO> getByAreaName(String areaName, Long userId) {
@@ -90,6 +93,18 @@ public class CourseService {
         }
 
         return postDTOs;
+    }
+
+    //코스 완주 할 경우 저장
+    public Long completeCourse(Long courseId, Long userId) {
+        Course course = courseRepository.findById(courseId).orElse(null);
+        User user = userRepository.findById(userId).orElse(null);
+        Log log = Log.builder()
+                .course(course)
+                .user(user)
+                .build();
+
+        return logRepository.save(log).getId();
     }
 
 }

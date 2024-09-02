@@ -64,9 +64,19 @@ public class CourseController {
     @Operation(summary = "코스 네이버 포스트 조회")
     @GetMapping(value = "/post/{course_id}")
     public ApiResponse<List<NaverBlogDTO>> getNaverBlogPost(
-            @RequestParam(value = "course_id")Long courseId
+            @RequestParam(value = "course_id")Long course_id
     ) {
-        return ApiResponse.onSuccess(courseService.getNaverBlogs(courseId));
+        return ApiResponse.onSuccess(courseService.getNaverBlogs(course_id));
+    }
+
+    @Operation(summary = "코스 완주하기")
+    @PostMapping(value = "/complete/{course_id}")
+    public ApiResponse<Long> completeCourse(
+            @RequestParam(value = "course_id") Long course_id
+    ) {
+        Long user_id = 1L;
+
+        return ApiResponse.onSuccess(courseService.completeCourse(course_id, user_id));
     }
 
     @Operation( summary = "이미지 업로드 테스트")
