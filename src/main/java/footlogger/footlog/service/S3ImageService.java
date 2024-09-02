@@ -105,7 +105,7 @@ public class S3ImageService {
         return amazonS3.getUrl(bucketName, s3FileName).toString();
     }
 
-    private void deleteImageFromS3(String imageAddress) {
+    public void delete(String imageAddress) {
         String key = getKeyFromImageAddress(imageAddress);
 
         try {

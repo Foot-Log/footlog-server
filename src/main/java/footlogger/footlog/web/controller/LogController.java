@@ -25,4 +25,9 @@ public class LogController {
        LogResponseDto.LogDetailDto response = logService.getLogDetail(tokenWithoutBearer, logId);
        return ApiResponse.onSuccess(response);
    }
+
+//   @PostMapping("/upload")
+//    public ApiResponse<> createLog(){
+//
+//   }
 }

@@ -32,4 +32,14 @@ public class Log {
     @OneToMany(mappedBy = "log", cascade = CascadeType.ALL)
     private List<LogPhoto> photos;
 
+    public void setPhotos(List<LogPhoto> photos) {
+        this.photos = photos;
+        for (LogPhoto photo : photos){
+            photo.setLog(this);
+        }
+    }
+    public void setLogContent(String logContent){
+        this.logContent = logContent;
+    }
+
 }

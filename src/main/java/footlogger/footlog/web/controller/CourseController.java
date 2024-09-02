@@ -65,7 +65,6 @@ public class CourseController {
     @PostMapping(value = "/s3/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> s3Upload(@RequestParam(value = "image") MultipartFile image) {
         String profileImage = s3ImageService.upload(image);
-
         return ResponseEntity.ok(profileImage);
     }
 }
