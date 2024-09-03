@@ -24,6 +24,5 @@ public class LogPhoto {
     private String url;
     public void setLog(Log log) {
         this.log = log;
-
     }
 }
