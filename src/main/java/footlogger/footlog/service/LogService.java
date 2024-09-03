@@ -93,6 +93,7 @@ public class LogService {
 
 
         log.setPhotos(photosToKeep);
+        log.setLogContent(logContent);
 
         if(newImages != null) {
             for(MultipartFile image : newImages){
@@ -101,9 +102,7 @@ public class LogService {
             }
         }
 
-        if(logContent != null) {
-            log.setLogContent(logContent);
-        }
+
         logRepository.save(log);
         return LogConverter.toLogDetail(log);
     }
