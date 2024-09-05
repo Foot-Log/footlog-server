@@ -13,6 +13,8 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -73,5 +75,48 @@ public class JwtTokenProvider {
     public Long getUserFromJwt(String token) {
         Claims claims = getBody(token);
         return Long.valueOf(claims.get(user_id).toString());
+    }
+
+    public Map<String, String> generateTokens(Long userId) {
+        String accessToken = generateAccessToken(userId);
+        String refreshToken = generateRefreshToken(userId);
+
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("accessToken", accessToken);
+        tokens.put("refreshToken", refreshToken);
+
+        return tokens;
+    }
+
+    //엑세스 토큰 생성
+    private String generateAccessToken(Long userId) {
+        final Date now = new Date();
+        final Date validity = new Date(now.getTime() + 1000 * 60 * 60);
+
+        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
+        claims.put(user_id, userId);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    // 리프레쉬 토큰 생성
+    private String generateRefreshToken(Long userId) {
+        final Date now = new Date();
+        final Date validity = new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7); // 1주일 유효
+
+        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
+        claims.put(user_id, userId);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(getSigningKey())
+                .compact();
     }
 }
