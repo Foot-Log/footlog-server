@@ -1,8 +1,6 @@
 package footlogger.footlog.web.controller;
 
-import footlogger.footlog.domain.Log;
 import footlogger.footlog.payload.ApiResponse;
-import footlogger.footlog.payload.code.status.ErrorStatus;
 import footlogger.footlog.service.LogService;
 import footlogger.footlog.web.dto.response.LogResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -39,13 +37,13 @@ public class LogController {
     public ResponseEntity<ApiResponse<LogResponseDto.LogDetailDto>> updateLog(
            @RequestHeader("Authorization") String token,
            @PathVariable("logId") Long logId,
-           @RequestParam("logContent") String logContent,
-           @RequestParam("existingUrls") List<String> existingUrls,
-           @RequestParam("newImages") List<MultipartFile> newImages
+           @RequestParam(required = false) String logContent,
+           @RequestParam(required = false) List<String> existingUrls,
+           @RequestPart(required = false) List<MultipartFile> newImages
            ) {
         try{
             String tokenWithoutBearer = token.substring(7);
-            LogResponseDto.LogDetailDto response = logService.updateLog(tokenWithoutBearer, logId, logContent,existingUrls, newImages);
+            LogResponseDto.LogDetailDto response = logService.updateLog(tokenWithoutBearer, logId, logContent, existingUrls, newImages);
             return new ResponseEntity<>(ApiResponse.onSuccess(response), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(ApiResponse.onFailure(_INTERNAL_SERVER_ERROR, null), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,12 +1,11 @@
 package footlogger.footlog.service;
 
 import footlogger.footlog.converter.LogConverter;
-import footlogger.footlog.domain.Course;
 import footlogger.footlog.domain.Log;
 import footlogger.footlog.domain.LogPhoto;
 import footlogger.footlog.domain.User;
-import footlogger.footlog.domain.jwt.JWTUtil;
 import footlogger.footlog.repository.CourseRepository;
+import footlogger.footlog.repository.LogPhotoRepository;
 import footlogger.footlog.repository.LogRepository;
 import footlogger.footlog.repository.UserRepository;
 import footlogger.footlog.web.dto.response.LogResponseDto;
@@ -25,6 +24,8 @@ public class LogService {
     private final LogRepository logRepository;
     private final CourseRepository courseRepository;
     private final S3ImageService s3ImageService;
+    private final LogPhotoRepository logPhotoRepository;
+
 
     @Transactional
     public LogResponseDto.LogListDto getCompletedList(String token) {
@@ -64,24 +65,45 @@ public class LogService {
         List<LogPhoto> photosToKeep = new ArrayList<>();
         List<String> urlsToDelete = new ArrayList<>();
 
-        for(LogPhoto photo : currentPhotos){
-            if(existingUrls.contains(photo.getUrl())){
-                photosToKeep.add(photo);
-            } else {
-                urlsToDelete.add(photo.getUrl());
+        if (existingUrls != null) {
+            for(LogPhoto photo : currentPhotos){
+                if(existingUrls.contains(photo.getUrl())){
+                    photosToKeep.add(photo);
+                } else {
+                    urlsToDelete.add(photo.getUrl());
+                }
+            }
+        } else {
+            urlsToDelete.addAll(currentPhotos.stream().map(LogPhoto::getUrl).toList());
+        }
+
+
+        for(String url : urlsToDelete) {
+            LogPhoto photoToDelete = currentPhotos.stream()
+                    .filter(photo -> photo.getUrl().equals(url))
+                    .findFirst()
+                    .orElse(null);
+
+            if (photoToDelete != null) {
+                log.getPhotos().remove(photoToDelete);
+                logPhotoRepository.delete(photoToDelete);
+                s3ImageService.delete(url);
             }
         }
-        for(String url : urlsToDelete) {
-            s3ImageService.delete(url);
-        }
-        for(MultipartFile image : newImages){
-            String uploadUrl = s3ImageService.upload(image);
-            photosToKeep.add(LogPhoto.builder().log(log).url(uploadUrl).build());
-        }
+
+
         log.setPhotos(photosToKeep);
         log.setLogContent(logContent);
-        logRepository.save(log);
 
+        if(newImages != null) {
+            for(MultipartFile image : newImages){
+                String uploadUrl = s3ImageService.upload(image);
+                photosToKeep.add(LogPhoto.builder().log(log).url(uploadUrl).build());
+            }
+        }
+
+
+        logRepository.save(log);
         return LogConverter.toLogDetail(log);
     }
 }

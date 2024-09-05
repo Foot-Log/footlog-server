@@ -17,13 +17,13 @@ public class LogConverter {
     public static LogResponseDto.LogNameDto toLogName(Log log){
         return LogResponseDto.LogNameDto.builder()
                 .logId(log.getId())
-                .name(log.getCourse().getName())
+                .address(log.getCourse().getAddress())
                 .build();
     }
     public static LogResponseDto.LogDetailDto toLogDetail(Log log) {
         return LogResponseDto.LogDetailDto.builder()
                 .logId(log.getId())
-                .name(log.getCourse().getName())
+                .address(log.getCourse().getAddress())
                 .logContent(log.getLogContent())
                 .photos(log.getPhotos().stream().map(LogPhoto::getUrl)
                         .collect(Collectors.toList()))

@@ -23,7 +23,7 @@ public class LogResponseDto {
     @AllArgsConstructor
     public static class LogNameDto {
         private Long logId;
-        private String name;
+        private String address;
     }
 
     @Builder
@@ -32,7 +32,7 @@ public class LogResponseDto {
     @AllArgsConstructor
     public static class LogDetailDto {
         private Long logId;
-        private String name;
+        private String address;
         private String logContent;
         private List<String> photos;
     }
