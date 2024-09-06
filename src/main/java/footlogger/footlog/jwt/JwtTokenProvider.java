@@ -1,6 +1,7 @@
 package footlogger.footlog.jwt;
 
 import footlogger.footlog.domain.enums.JwtValidationType;
+import footlogger.footlog.web.dto.response.UserResponseDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -77,15 +78,15 @@ public class JwtTokenProvider {
         return Long.valueOf(claims.get(user_id).toString());
     }
 
-    public Map<String, String> generateTokens(Long userId) {
+    public UserResponseDto.LoginResultDto generateTokens(Long userId) {
         String accessToken = generateAccessToken(userId);
         String refreshToken = generateRefreshToken(userId);
 
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
+        return UserResponseDto.LoginResultDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
 
-        return tokens;
     }
 
     //엑세스 토큰 생성
