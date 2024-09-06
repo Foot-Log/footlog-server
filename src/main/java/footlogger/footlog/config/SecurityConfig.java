@@ -34,19 +34,19 @@ public class SecurityConfig {
             ,"/course/**", "/log/**", "/user/**", "/v3/api-docs/**"
     };
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedOrigin("http://43.201.255.209:8080");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
-    }
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration config = new CorsConfiguration();
+//        config.setAllowCredentials(true);
+//        config.addAllowedOrigin("http://localhost:3000");
+//        config.addAllowedOrigin("http://43.201.255.209:8080");
+//        config.addAllowedHeader("*");
+//        config.addAllowedMethod("*");
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", config);
+//        return source;
+//    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, CustomJwtAuthenticationEntryPoint customJwtAuthenticationEntryPoint) throws Exception {
@@ -65,9 +65,10 @@ public class SecurityConfig {
                     auth.requestMatchers(AUTH_WHITELIST).permitAll();
                     auth.anyRequest().authenticated();
                 })
+                .cors(withDefaults()) // CORS를 가장 먼저 처리하도록 이동
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        http.cors(withDefaults());
+
 
         return http.build();
     }
