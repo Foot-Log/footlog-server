@@ -18,8 +18,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final LogRepository logRepository;
 
-    public Optional<User> findByKakaoId(Long kakaoId) {
-        return userRepository.findByKakaoId(kakaoId);
+    public User findByKakaoId(Long kakaoId) {
+        return userRepository.findByKakaoId(kakaoId).orElse(null);
     }
 
     public void save(User user){

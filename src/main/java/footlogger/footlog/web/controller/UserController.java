@@ -27,19 +27,22 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/kakao/callback")
-    public ResponseEntity<ApiResponse<UserResponseDto.LoginResultDto>> callback(@RequestParam("code") String code) {
+    public ApiResponse<UserResponseDto.LoginResultDto> callback(@RequestParam("code") String code) {
         try {
             KakaoTokenResponseDto kakaoTokenResponseDto = kakaoService.getAccessTokenFromKakao(code);
             KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(kakaoTokenResponseDto.getAccessToken());
-            kakaoService.handleUserRegistration(userInfo, kakaoTokenResponseDto);
+//
+            UserResponseDto.LoginResultDto loginResultDto = kakaoService.handleUserLogin(userInfo);
 
-            UserResponseDto.LoginResultDto loginResultDto = UserResponseDto.LoginResultDto.builder()
-                    .accessToken(kakaoTokenResponseDto.getAccessToken())
-                    .refreshToken(kakaoTokenResponseDto.getAccessToken())
-                    .build();
-            return new ResponseEntity<>(ApiResponse.onSuccess(loginResultDto), HttpStatus.OK);
+//            kakaoService.handleUserRegistration(userInfo, kakaoTokenResponseDto);
+//
+//            UserResponseDto.LoginResultDto loginResultDto = UserResponseDto.LoginResultDto.builder()
+//                    .accessToken(kakaoTokenResponseDto.getAccessToken())
+//                    .refreshToken(kakaoTokenResponseDto.getAccessToken())
+//                    .build();
+            return ApiResponse.onSuccess(loginResultDto);
         } catch (Exception e) {
-            return new ResponseEntity<>(ApiResponse.onFailure(_INTERNAL_SERVER_ERROR, null), HttpStatus.INTERNAL_SERVER_ERROR);
+            return ApiResponse.onFailure(_INTERNAL_SERVER_ERROR, null);
         }
     }
 

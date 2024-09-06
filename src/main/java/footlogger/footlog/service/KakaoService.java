@@ -3,8 +3,11 @@ package footlogger.footlog.service;
 import ch.qos.logback.core.joran.util.beans.BeanDescriptionFactory;
 import footlogger.footlog.domain.User;
 import footlogger.footlog.domain.jwt.JWTUtil;
+import footlogger.footlog.jwt.JwtTokenProvider;
+import footlogger.footlog.repository.UserRepository;
 import footlogger.footlog.web.dto.response.KakaoTokenResponseDto;
 import footlogger.footlog.web.dto.response.KakaoUserInfoResponseDto;
+import footlogger.footlog.web.dto.response.UserResponseDto;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +27,10 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class KakaoService {
+
+    private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @Value("${kakao.client_id}")
     private String clientId;
@@ -61,13 +67,13 @@ public class KakaoService {
                     })
                     .bodyToMono(KakaoTokenResponseDto.class)
                     .block();
-
             return kakaoTokenResponseDto;
         } catch (Exception e) {
             log.error("Error occurred while getting access token from Kakao: ", e);
             throw new RuntimeException("Failed to retrieve access token from Kakao", e);
         }
     }
+
     public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
 
         KakaoUserInfoResponseDto userInfo = WebClient.create(userInfoUri)
@@ -89,10 +95,12 @@ public class KakaoService {
 
     // 사용자 정보로 회원가입 처리
     public void handleUserRegistration(KakaoUserInfoResponseDto userInfo, KakaoTokenResponseDto kakaoTokenResponseDto) {
-        Long kakaoId = userInfo.getId();
-        Optional<User> existingUser = userService.findByKakaoId(kakaoId);
 
-        if (existingUser.isEmpty()) { // 유저가 존재하지 않으면 회원가입 처리
+
+        Long kakaoId = userInfo.getId();
+        User existingUser = userService.findByKakaoId(kakaoId);
+
+        if (existingUser != null) { // 유저가 존재하지 않으면 회원가입 처리
             User newUser = User.builder()
                     .kakaoId(kakaoId)
                     .nickname(userInfo.getKakaoAccount().getProfile().getNickName())
@@ -105,12 +113,41 @@ public class KakaoService {
                     .build();
 
             userService.save(newUser);
-        }else {
+        } else {
             // 이미 존재하는 경우 토큰을 업데이트
-            User user = existingUser.get();
+            User user = existingUser;
             user.setAccessToken(kakaoTokenResponseDto.getAccessToken());
             user.setRefreshToken(kakaoTokenResponseDto.getRefreshToken());
             userService.save(user); // 갱신된 정보 저장
+        }
+    }
+
+    public UserResponseDto.LoginResultDto handleUserLogin(KakaoUserInfoResponseDto userInfo) {
+        User existingUser = userService.findByKakaoId(userInfo.getId());
+
+        if (existingUser != null) {
+            // 이미 유저가 존재하면 엑세스 토큰과 리프레쉬 토큰을 발급
+            return jwtTokenProvider.generateTokens(existingUser.getId());
+        } else {
+            // 유저가 없으면 회원가입 처리 후 토큰 발급
+            User newUser = User.builder()
+                    .kakaoId(userInfo.getId())
+                    .nickname(userInfo.getKakaoAccount().getProfile().getNickName())
+                    .profileImg(userInfo.getKakaoAccount().getProfile().getProfileImageUrl())
+                    .email(userInfo.getKakaoAccount().getEmail())
+                    .level("새싹")
+                    .stampCount(0L)
+                    .build(); // 회원가입 처리 로직 추가
+
+            newUser = userRepository.save(newUser);
+
+            UserResponseDto.LoginResultDto tokens = jwtTokenProvider.generateTokens(newUser.getId());
+            newUser.setAccessToken(tokens.getAccessToken());
+            newUser.setRefreshToken(tokens.getRefreshToken());
+
+            userRepository.save(newUser);
+
+            return tokens;
         }
     }
 }
