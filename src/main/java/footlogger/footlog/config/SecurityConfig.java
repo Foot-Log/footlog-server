@@ -39,9 +39,9 @@ public class SecurityConfig {
                 {
                     exception.authenticationEntryPoint(jwtAuthenticationEntryPoint);
                     exception.accessDeniedHandler(jwtAccessDeniedHandler);
-                });
-
-        http.authorizeRequests(auth -> {
+                })
+                .cors(cors -> {})
+                .authorizeRequests(auth -> {
                     auth.requestMatchers(AUTH_WHITELIST).permitAll();
                     auth.anyRequest().authenticated();
                 })
