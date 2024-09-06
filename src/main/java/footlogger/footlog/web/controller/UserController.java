@@ -26,6 +26,7 @@ public class UserController {
     private final KakaoService kakaoService;
     private final UserService userService;
 
+    @CrossOrigin("*")
     @GetMapping("/kakao/callback")
     public ApiResponse<UserResponseDto.LoginResultDto> callback(@RequestParam("code") String code) {
         try {
