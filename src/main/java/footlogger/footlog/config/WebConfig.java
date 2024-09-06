@@ -1,11 +1,12 @@
 package footlogger.footlog.config;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+@Configuration
 public class WebConfig implements WebMvcConfigurer {
     private static final String CORS_URL_PATTERN = "/**";
-    private static final String CORS_URL = "http://localhost:3000"; // 허용할 프론트엔드 URL
     private static final String CORS_METHOD = "*";
 
     @Override
