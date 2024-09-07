@@ -58,7 +58,7 @@ public CorsConfigurationSource corsConfigurationSource() {
 
     configuration.setMaxAge(3600L);
 
-    configuration.addAllowedOriginPattern("http://52.78.170.231:8080");
+    configuration.addAllowedOriginPattern("http://54.180.137.192:8080");
 
     configuration.addAllowedOriginPattern("http://localhost:3000");
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
