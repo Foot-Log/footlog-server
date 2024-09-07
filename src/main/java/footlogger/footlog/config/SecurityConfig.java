@@ -61,7 +61,7 @@ public CorsConfigurationSource corsConfigurationSource() {
     configuration.addAllowedOriginPattern("http://52.78.170.231:8080");
 
     configuration.addAllowedOriginPattern("http://localhost:3000");
-    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTION"));
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of(AUTHORIZATION, CONTENT_TYPE, CONTENT_DISPOSITION));
     configuration.setExposedHeaders(List.of(AUTHORIZATION, CONTENT_TYPE, CONTENT_DISPOSITION));
 
