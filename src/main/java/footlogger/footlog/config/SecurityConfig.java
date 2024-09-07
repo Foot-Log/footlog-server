@@ -47,6 +47,19 @@ public class SecurityConfig {
 //        source.registerCorsConfiguration("/**", config);
 //        return source;
 //    }
+@Bean
+public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+
+    configuration.setMaxAge(3600L);
+
+    configuration.addAllowedOriginPattern("http://43.201.255.209:8080");
+
+    configuration.addAllowedOriginPattern("http://localhost:3000");
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+}
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, CustomJwtAuthenticationEntryPoint customJwtAuthenticationEntryPoint) throws Exception {
