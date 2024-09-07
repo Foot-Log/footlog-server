@@ -49,6 +49,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new RuntimeException(e);
         }
 
+        response.setHeader("Access-Control-Allow-Origin", "*");
+
         // 다음 필터로 진행
         filterChain.doFilter(request, response);
     }
