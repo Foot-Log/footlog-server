@@ -19,6 +19,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
+
+import static org.apache.tomcat.util.http.fileupload.FileUploadBase.CONTENT_DISPOSITION;
+import static org.apache.tomcat.util.http.fileupload.FileUploadBase.CONTENT_TYPE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -56,6 +61,10 @@ public CorsConfigurationSource corsConfigurationSource() {
     configuration.addAllowedOriginPattern("http://52.78.170.231:8080");
 
     configuration.addAllowedOriginPattern("http://localhost:3000");
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
+    configuration.setAllowedHeaders(List.of(AUTHORIZATION, CONTENT_TYPE, CONTENT_DISPOSITION));
+    configuration.setExposedHeaders(List.of(AUTHORIZATION, CONTENT_TYPE, CONTENT_DISPOSITION));
+
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
