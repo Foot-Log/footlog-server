@@ -41,6 +41,7 @@ public class UserController {
 //                    .accessToken(kakaoTokenResponseDto.getAccessToken())
 //                    .refreshToken(kakaoTokenResponseDto.getAccessToken())
 //                    .build();
+            log.info("Login result: {}", loginResultDto);
             return ApiResponse.onSuccess(loginResultDto);
         } catch (Exception e) {
             return ApiResponse.onFailure(_INTERNAL_SERVER_ERROR, null);

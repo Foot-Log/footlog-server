@@ -45,53 +45,92 @@ public class KakaoService {
     private String userInfoUri;
 
 
+    //    public KakaoTokenResponseDto getAccessTokenFromKakao(String code) {
+//        try {
+//            log.info(code);
+//            KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(tokenUri).post()
+//                    .uri(uriBuilder -> uriBuilder
+//                            .path("/oauth/token")
+//                            .queryParam("grant_type", "authorization_code")
+//                            .queryParam("client_id", clientId)
+//                            .queryParam("redirect_uri", redirectUri)
+//                            .queryParam("code", code)
+//                            .build())
+//                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+//                    .retrieve()
+//                    .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+//                        log.error("4xx error when requesting access token: {}", clientResponse.statusCode());
+//                        log.error("Response body: {}", clientResponse.bodyToMono(String.class).block());
+//
+//                        return Mono.error(new RuntimeException("Invalid Parameter - " + clientResponse.statusCode()));
+//                    })
+//                    .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
+//                        log.error("5xx error when requesting access token: {}", clientResponse.statusCode());
+//                        return Mono.error(new RuntimeException("Internal Server Error - " + clientResponse.statusCode()));
+//                    })
+//                    .bodyToMono(KakaoTokenResponseDto.class)
+//                    .block();
+//            return kakaoTokenResponseDto;
+//        } catch (Exception e) {
+//            log.error("Error occurred while getting access token from Kakao: ", e);
+//            throw new RuntimeException("Failed to retrieve access token from Kakao", e);
+//        }
+//    }
     public KakaoTokenResponseDto getAccessTokenFromKakao(String code) {
         try {
-            KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(tokenUri).post()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/oauth/token")
-                            .queryParam("grant_type", "authorization_code")
-                            .queryParam("client_id", clientId)
-                            .queryParam("redirect_uri", redirectUri)
-                            .queryParam("code", code)
-                            .build())
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                    .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
-                        log.error("4xx error when requesting access token: {}", clientResponse.statusCode());
-                        return Mono.error(new RuntimeException("Invalid Parameter - " + clientResponse.statusCode()));
-                    })
-                    .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
-                        log.error("5xx error when requesting access token: {}", clientResponse.statusCode());
-                        return Mono.error(new RuntimeException("Internal Server Error - " + clientResponse.statusCode()));
-                    })
-                    .bodyToMono(KakaoTokenResponseDto.class)
-                    .block();
-            return kakaoTokenResponseDto;
+            RestTemplate restTemplate = new RestTemplate();
+            String uri = UriComponentsBuilder.fromUriString(tokenUri)
+                    .path("/oauth/token")
+                    .queryParam("grant_type", "authorization_code")
+                    .queryParam("client_id", clientId)
+                    .queryParam("redirect_uri", redirectUri)
+                    .queryParam("code", code)
+                    .toUriString();
+
+            ResponseEntity<KakaoTokenResponseDto> responseEntity = restTemplate.postForEntity(uri, null, KakaoTokenResponseDto.class);
+            return responseEntity.getBody();
         } catch (Exception e) {
             log.error("Error occurred while getting access token from Kakao: ", e);
             throw new RuntimeException("Failed to retrieve access token from Kakao", e);
+        }}
+
+    //    public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
+//
+//        KakaoUserInfoResponseDto userInfo = WebClient.create(userInfoUri)
+//                .get()
+//                .uri(uriBuilder -> uriBuilder
+//                        .scheme("https")
+//                        .path("/v2/user/me")
+//                        .build(true))
+//                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken) // access token 인가
+//                .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
+//                .retrieve()
+//                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
+//                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
+//                .bodyToMono(KakaoUserInfoResponseDto.class)
+//                .block();
+//
+//        return userInfo;
+//    }
+    public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + accessToken);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            String uri = UriComponentsBuilder.fromUriString(userInfoUri)
+                    .path("/v2/user/me")
+                    .toUriString();
+
+            ResponseEntity<KakaoUserInfoResponseDto> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, KakaoUserInfoResponseDto.class);
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            log.error("Error occurred while getting user info from Kakao: ", e);
+            throw new RuntimeException("Failed to retrieve user info from Kakao", e);
         }
     }
 
-    public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
-
-        KakaoUserInfoResponseDto userInfo = WebClient.create(userInfoUri)
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .scheme("https")
-                        .path("/v2/user/me")
-                        .build(true))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken) // access token 인가
-                .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
-                .bodyToMono(KakaoUserInfoResponseDto.class)
-                .block();
-
-        return userInfo;
-    }
 
     // 사용자 정보로 회원가입 처리
     public void handleUserRegistration(KakaoUserInfoResponseDto userInfo, KakaoTokenResponseDto kakaoTokenResponseDto) {

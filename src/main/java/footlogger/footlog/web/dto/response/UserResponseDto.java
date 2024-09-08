@@ -10,6 +10,7 @@ public class UserResponseDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    @ToString
     public static class LoginResultDto {
         private String accessToken;
         private String refreshToken;
