@@ -47,6 +47,6 @@ public class SearchController {
     ) {
         searchService.saveRecentSearchLog(token, keyword);
 
-        return ApiResponse.onSuccess(courseService.getByAreaName("서울", 1L));
+        return ApiResponse.onSuccess(courseService.getByAreaName(token, "서울"));
     }
 }
