@@ -12,9 +12,11 @@ import footlogger.footlog.repository.LogRepository;
 import footlogger.footlog.repository.SaveRepository;
 import footlogger.footlog.repository.UserRepository;
 import footlogger.footlog.utils.NaverBlog;
+import footlogger.footlog.utils.RecommendSystem;
 import footlogger.footlog.web.dto.response.CourseDetailDTO;
 import footlogger.footlog.web.dto.response.CourseResponseDTO;
 import footlogger.footlog.web.dto.response.NaverBlogDTO;
+import footlogger.footlog.web.dto.response.PreferenceRequestBody;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
@@ -40,6 +42,7 @@ public class CourseService {
     private final NaverBlog naverBlog;
     private final NaverBlogConverter naverBlogConverter;
     private final LogRepository logRepository;
+    private final RecommendSystem recommendSystem;
 
     //지역기반으로 코스를 받아 옴
     public List<CourseResponseDTO> getByAreaName(String areaName, Long userId) {
@@ -107,4 +110,43 @@ public class CourseService {
         return logRepository.save(log).getId();
     }
 
+    //플라스크 서버로 분석요청 보낸 후 코스id 받아옴
+    public List<CourseResponseDTO> analyzePreference(String token, PreferenceRequestBody request) {
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        List<Long> courseIds = recommendSystem.getRecommendations(request);
+
+        List<Course> courses = courseIds.stream()
+                .map(courseRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+
+        //서버에 저장
+        saveCourses(courses, user);
+
+        return courses.stream()
+                .map(course -> courseConverter.toResponseDTO(course, user.getId()))
+                .collect(Collectors.toList());
+    }
+
+    //플라스크 서버에서 받아온 코스 저장
+    public void saveCourses(List<Course> courses, User user) {
+        for(Course course : courses) {
+            SaveCourse saveCourse = new SaveCourse(null, course, user);
+            saveRepository.save(saveCourse);
+        }
+    }
+
+    //저장되어 있는 추천 코스 반환
+    public List<CourseResponseDTO> getRecommendCourse(String token) {
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        return saveRepository.findByUserId(user.getId()).stream()
+                .map(SaveCourse::getCourse)
+                .map(course -> courseConverter.toResponseDTO(course, user.getId()))
+                .toList();
+    }
 }

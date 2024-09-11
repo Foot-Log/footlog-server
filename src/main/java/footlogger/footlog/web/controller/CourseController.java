@@ -8,6 +8,7 @@ import footlogger.footlog.service.SaveService;
 import footlogger.footlog.web.dto.response.CourseDetailDTO;
 import footlogger.footlog.web.dto.response.CourseResponseDTO;
 import footlogger.footlog.web.dto.response.NaverBlogDTO;
+import footlogger.footlog.web.dto.response.PreferenceRequestBody;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -36,6 +37,23 @@ public class CourseController {
         List<CourseResponseDTO> courses = courseService.getByAreaName(area_name, user_id);
 
         return ApiResponse.onSuccess(courses);
+    }
+
+    @Operation(summary = "선호도 코스 분석")
+    @PostMapping("/analyze")
+    public ApiResponse<List<CourseResponseDTO>> analyzePreference(
+            @RequestHeader String token,
+            @RequestBody PreferenceRequestBody requestBody
+            ) {
+        return ApiResponse.onSuccess(courseService.analyzePreference(token, requestBody));
+    }
+
+    @Operation(summary = "추천 코스 조회")
+    @GetMapping("/recommend")
+    public ApiResponse<List<CourseResponseDTO>> recommendCourse(
+            @RequestHeader String token
+    ) {
+        return ApiResponse.onSuccess(courseService.getRecommendCourse(token));
     }
 
     @Operation(summary = "코스 클릭 시 상세 정보 조회")
@@ -85,4 +103,6 @@ public class CourseController {
         String profileImage = s3ImageService.upload(image);
         return ResponseEntity.ok(profileImage);
     }
+
+
 }
