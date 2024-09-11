@@ -17,7 +17,9 @@ public class SaveService {
 
     //코스의 저장여부 판단
     public Boolean getSaveStatus(Long courseId, Long userId) {
-        Course targetCourse = courseRepository.findById(courseId).orElse(null);
+        Course targetCourse = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("코스를 찾을 수 없습니다."));
+
         List<Long> idList = saveRepository.findCoursesByUserId(userId).stream()
                 .map(Course::getId)
                 .toList();

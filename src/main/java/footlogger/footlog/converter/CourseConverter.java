@@ -19,8 +19,7 @@ public class CourseConverter {
     private final SaveService saveService;
     private final AreaConverter areaConverter;
 
-    public CourseResponseDTO toResponseDTO(Course course, Long userId) {
-        boolean isSave = saveService.getSaveStatus(course.getId(), userId);
+    public CourseResponseDTO toResponseDTO(Course course, Boolean isSave) {
         String area = areaConverter.getAreaNameByCode(course.getAreaCode());
         List<String> images = course.getImages().stream()
                 .map(CourseImage::getImage)
@@ -35,8 +34,7 @@ public class CourseConverter {
                 .build();
     }
 
-    public CourseDetailDTO toDetailDTO(Course course, Long userId) {
-        boolean isSave = saveService.getSaveStatus(course.getId(), userId);
+    public CourseDetailDTO toDetailDTO(Course course, Boolean isSave) {
         List<String> images = course.getImages().stream()
                 .map(CourseImage::getImage)
                 .toList();

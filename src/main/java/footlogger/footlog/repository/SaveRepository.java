@@ -14,4 +14,6 @@ public interface SaveRepository extends JpaRepository<SaveCourse, Long>, CustomS
 
     @Query("SELECT sc FROM SaveCourse sc WHERE sc.course.id = :courseId AND sc.user.id = :userId")
     Optional<SaveCourse> findByCourseIdAndUserId(@Param("courseId") Long courseId,@Param("userId") Long userId);
+
+    List<SaveCourse> findByUserId(Long userId);
 }
