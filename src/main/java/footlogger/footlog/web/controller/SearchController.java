@@ -4,6 +4,7 @@ import footlogger.footlog.payload.ApiResponse;
 import footlogger.footlog.repository.CourseRepository;
 import footlogger.footlog.service.CourseService;
 import footlogger.footlog.service.SearchService;
+import footlogger.footlog.web.dto.response.CourseCountDTO;
 import footlogger.footlog.web.dto.response.CourseResponseDTO;
 import footlogger.footlog.web.dto.response.SearchLogDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,11 +33,13 @@ public class SearchController {
 
     @Operation(summary = "검색어 삭제")
     @PatchMapping("/search/delete")
-    public ApiResponse<Long> deleteSearchLog(
+    public ApiResponse<CourseCountDTO> deleteSearchLog(
             @RequestHeader("Authorization") String token,
             @RequestBody SearchLogDTO requestBody
     ) {
-        return ApiResponse.onSuccess(searchService.deleteRecentSearchLog(token, requestBody));
+        return ApiResponse.onSuccess(CourseCountDTO.builder()
+                        .Count(searchService.deleteRecentSearchLog(token, requestBody))
+                .build());
     }
 
     @Operation(summary = "검색")
