@@ -7,6 +7,7 @@ import footlogger.footlog.service.UserService;
 import footlogger.footlog.web.dto.response.KakaoTokenResponseDto;
 import footlogger.footlog.web.dto.response.KakaoUserInfoResponseDto;
 import footlogger.footlog.web.dto.response.UserResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ public class UserController {
     private final UserService userService;
 
     @CrossOrigin("*")
+    @Operation(summary = "카카오 로그인 및 회원 가입")
     @GetMapping("/kakao/callback")
     public ApiResponse<UserResponseDto.LoginResultDto> callback(@RequestParam("code") String code) {
         try {
@@ -48,6 +50,7 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "유저 정보 조회")
     @GetMapping("/info")
     public ApiResponse<UserResponseDto.UserInfoDto> getUserInfo(@RequestHeader("Authorization") String token) {
         String tokenWithoutBearer = token.substring(7);
@@ -55,6 +58,7 @@ public class UserController {
         return ApiResponse.onSuccess(response);
     }
 
+    @Operation(summary = "회원 탈퇴")
     @DeleteMapping("/withdraw")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@RequestHeader("Authorization") String token) {
         String tokenWithoutBearer = token.substring(7);
