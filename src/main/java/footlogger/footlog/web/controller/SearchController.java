@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/search")
 @RequiredArgsConstructor
 public class SearchController {
     private final SearchService searchService;
@@ -22,7 +23,7 @@ public class SearchController {
     private final CourseRepository courseRepository;
 
     @Operation(summary = "최근 검색어 조회")
-    @GetMapping("/search/recent")
+    @GetMapping("/recent")
     public ApiResponse<List<SearchLogDTO>> findRecentSearchLog(
             @RequestHeader("Authorization") String token
     ) {
@@ -32,7 +33,7 @@ public class SearchController {
     }
 
     @Operation(summary = "검색어 삭제")
-    @PatchMapping("/search/delete")
+    @PatchMapping("/delete")
     public ApiResponse<CourseCountDTO> deleteSearchLog(
             @RequestHeader("Authorization") String token,
             @RequestBody SearchLogDTO requestBody
@@ -43,7 +44,7 @@ public class SearchController {
     }
 
     @Operation(summary = "검색")
-    @GetMapping("/search/course/{keyword}")
+    @GetMapping("/course/{keyword}")
     public ApiResponse<List<CourseResponseDTO>> searchCourse(
             @RequestHeader("Authorization") String token,
             @PathVariable("keyword") String keyword
