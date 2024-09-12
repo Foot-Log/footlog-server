@@ -12,7 +12,7 @@ public class NaverBlogConverter {
         return NaverBlogDTO.builder()
                 .title(removeSpecificHtmlTags(jsonObject.getString("title")))
                 .link(jsonObject.getString("link"))
-                .summary(jsonObject.getString("description"))
+                .summary(removeSpecificHtmlTags(jsonObject.getString("description")))
                 .blog_name(jsonObject.getString("bloggername"))
                 .post_date(jsonObject.getString("postdate"))
                 .build();

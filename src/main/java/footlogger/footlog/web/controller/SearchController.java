@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/search")
+@RequestMapping("/search")
 @RequiredArgsConstructor
 public class SearchController {
     private final SearchService searchService;
@@ -51,6 +51,6 @@ public class SearchController {
     ) {
         searchService.saveRecentSearchLog(token, keyword);
 
-        return ApiResponse.onSuccess(courseService.getByAreaName(token, "서울"));
+        return ApiResponse.onSuccess(courseService.getByAreaName(token, 1L));
     }
 }

@@ -1,7 +1,9 @@
 package footlogger.footlog.web.controller;
 
+import footlogger.footlog.converter.AreaConverter;
 import footlogger.footlog.domain.Course;
 import footlogger.footlog.payload.ApiResponse;
+import footlogger.footlog.service.AreaService;
 import footlogger.footlog.service.CourseService;
 import footlogger.footlog.service.S3ImageService;
 import footlogger.footlog.service.SaveService;
@@ -17,21 +19,23 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/course")
+@RequestMapping("/course")
 @RequiredArgsConstructor
 public class CourseController {
     private final CourseService courseService;
     private final SaveService saveService;
     private final S3ImageService s3ImageService;
+    private final AreaConverter areaConverter;
+    private final AreaService areaService;
 
     @Operation(summary = "지역 선택 시 해당 코스 반환")
-    @GetMapping("/area/{area_name}")
+    @GetMapping("/area/{areaCode}")
     public ApiResponse<List<CourseResponseDTO>> coursesFromArea(
             @RequestHeader String token,
-            @PathVariable String area_name
+            @PathVariable Long areaCode
     ) {
         //임시 유저값
-        List<CourseResponseDTO> courses = courseService.getByAreaName(token, area_name);
+        List<CourseResponseDTO> courses = courseService.getByAreaName(token, areaCode);
 
         return ApiResponse.onSuccess(courses);
     }
@@ -91,6 +95,12 @@ public class CourseController {
     ) {
         return ApiResponse.onSuccess(CourseIdDTO.builder()
                         .courseId(courseService.completeCourse(token, course_id)).build());
+    }
+
+    @Operation(summary = "지역 코드 리스트 반환")
+    @GetMapping(value = "/area_code")
+    public ApiResponse<List<AreaCodeDTO>> getAreaCodes() {
+        return ApiResponse.onSuccess(areaService.getAreaCodes());
     }
 
     @Operation( summary = "이미지 업로드 테스트")

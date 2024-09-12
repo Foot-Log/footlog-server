@@ -1,10 +1,11 @@
 package footlogger.footlog.converter;
 
+import footlogger.footlog.web.dto.response.AreaCodeDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -31,6 +32,8 @@ public class AreaConverter {
         codeToName.put(37, "전라북도");
         codeToName.put(38, "전라남도");
         codeToName.put(39, "제주도");
+        codeToName.put(0, "전체");
+
 
         codeToName.forEach((code, name) -> nameToCode.put(name, code));
     }
@@ -44,4 +47,26 @@ public class AreaConverter {
     public String getAreaNameByCode(Integer code) {
         return codeToName.getOrDefault(code, "Unknown Name");
     }
+
+    public List<AreaCodeDTO> getAreaCodeDTOByCodes() {
+        List<Integer> codeList = Arrays.asList(0,1,31,2,32,3,8,34,33,6,7,36,35,4,5,38,37,39);
+        List<String> nameList = codeList.stream()
+                .map(this::getAreaNameByCode) // 코드에 해당하는 이름을 찾는 함수 호출
+                .toList();
+
+        List<AreaCodeDTO> areaCodeDTOList = new ArrayList<>();
+
+        for (int i = 0; i < codeList.size(); i++) {
+            AreaCodeDTO areaCodeDTO = AreaCodeDTO.builder()
+                    .areaCode(Long.valueOf(codeList.get(i)))
+                    .areaName(nameList.get(i))
+                    .build();
+
+            areaCodeDTOList.add(areaCodeDTO);
+        }
+
+        return areaCodeDTOList;
+    }
 }
+
+

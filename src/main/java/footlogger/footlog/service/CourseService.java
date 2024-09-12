@@ -43,11 +43,10 @@ public class CourseService {
     private final SaveService saveService;
 
     //지역기반으로 코스를 받아 옴
-    public List<CourseResponseDTO> getByAreaName(String token, String areaName) {
+    public List<CourseResponseDTO> getByAreaName(String token, Long areaCode) {
         User user = userRepository.findByAccessToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
-        int areaCode = areaConverter.getCodeByAreaName(areaName);
         List<Course> courses = courseRepository.findByAreaCode(areaCode);
 
 

@@ -17,5 +17,5 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     //지역 코드에 맞게 코스들을 저장수 순으로 불러옴
     @Query("SELECT c FROM Course c WHERE c.areaCode = :areaCode ORDER BY c.totalSaves")
-    List<Course> findByAreaCode(@Param("areaCode") int areaCode);
+    List<Course> findByAreaCode(@Param("areaCode") Long areaCode);
 }
