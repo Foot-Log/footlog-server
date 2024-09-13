@@ -1,6 +1,7 @@
 package footlogger.footlog.service;
 
 import footlogger.footlog.converter.LogConverter;
+import footlogger.footlog.domain.Course;
 import footlogger.footlog.domain.Log;
 import footlogger.footlog.domain.LogPhoto;
 import footlogger.footlog.domain.User;
@@ -105,5 +106,18 @@ public class LogService {
 
         logRepository.save(log);
         return LogConverter.toLogDetail(log);
+    }
+
+    //유저의 완주 여부 확인
+    public Boolean getCompleteStatus(Long userId, Long CourseId) {
+        Course targetCourse = courseRepository.findById(CourseId)
+            .orElseThrow(() -> new RuntimeException("코스를 찾을 수 없습니다."));
+
+        List<Long> idList = logRepository.findLogByUserId(userId).stream()
+                .map(Log::getCourse)
+                .map(Course::getId)
+                .toList();
+
+        return idList.contains(targetCourse.getId());
     }
 }

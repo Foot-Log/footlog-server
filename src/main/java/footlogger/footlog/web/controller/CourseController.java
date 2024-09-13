@@ -1,7 +1,6 @@
 package footlogger.footlog.web.controller;
 
 import footlogger.footlog.converter.AreaConverter;
-import footlogger.footlog.domain.Course;
 import footlogger.footlog.payload.ApiResponse;
 import footlogger.footlog.service.AreaService;
 import footlogger.footlog.service.CourseService;
@@ -12,7 +11,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,12 +38,21 @@ public class CourseController {
         return ApiResponse.onSuccess(courses);
     }
 
+//    @Operation(summary = "선호도 코스 분석 : 테스트 용")
+//    @PostMapping("/analyze")
+//    public ApiResponse<List<Long>> analyzePreference(
+//            @RequestHeader String token,
+//            @RequestBody PreferenceRequestBody requestBody
+//            ) {
+//        return ApiResponse.onSuccess(courseService.analyzePreference(token, requestBody));
+//    }
+
     @Operation(summary = "선호도 코스 분석")
     @PostMapping("/analyze")
     public ApiResponse<List<CourseResponseDTO>> analyzePreference(
             @RequestHeader String token,
             @RequestBody PreferenceRequestBody requestBody
-            ) {
+    ) {
         return ApiResponse.onSuccess(courseService.analyzePreference(token, requestBody));
     }
 
@@ -89,12 +96,12 @@ public class CourseController {
 
     @Operation(summary = "코스 완주하기")
     @PostMapping(value = "/complete/{course_id}")
-    public ApiResponse<CourseIdDTO> completeCourse(
+    public ApiResponse<LogIdDTO> completeCourse(
             @RequestHeader String token,
             @PathVariable(value = "course_id") Long course_id
     ) {
-        return ApiResponse.onSuccess(CourseIdDTO.builder()
-                        .courseId(courseService.completeCourse(token, course_id)).build());
+        return ApiResponse.onSuccess(LogIdDTO.builder()
+                        .logId(courseService.completeCourse(token, course_id)).build());
     }
 
     @Operation(summary = "지역 코드 리스트 반환")

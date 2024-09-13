@@ -36,6 +36,7 @@ public class CourseService {
     private final RecommendSystem recommendSystem;
     private final SaveService saveService;
     private final RecommendRepository recommendRepository;
+    private final LogService logService;
 
     //지역기반으로 코스를 받아 옴
     public List<CourseResponseDTO> getByAreaName(String token, Long areaCode) {
@@ -59,8 +60,9 @@ public class CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new IllegalArgumentException("코스를 찾을 수 없습니다."));
         Boolean isSave = saveService.getSaveStatus(course.getId(), user.getId());
+        Boolean isComplete = logService.getCompleteStatus(user.getId(), course.getId());
 
-        return courseConverter.toDetailDTO(course, isSave);
+        return courseConverter.toDetailDTO(course, isSave, isComplete);
     }
 
     //클릭 때 마다 코스를 저장하고 취소하는 토글 기능
@@ -143,6 +145,25 @@ public class CourseService {
                         .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
                 .collect(Collectors.toList());
     }
+
+    //테스트
+//    public List<Long> analyzePreference(String token, PreferenceRequestBody request) {
+//        User user = userRepository.findByAccessToken(token)
+//                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+//
+//        List<Long> courseIds = recommendSystem.getRecommendations(request);
+//
+//        List<Course> courses = courseIds.stream()
+//                .map(courseRepository::findById)
+//                .filter(Optional::isPresent)
+//                .map(Optional::get)
+//                .toList();
+//
+//        //서버에 저장
+//        saveCourses(courses, user);
+//
+//        return courseIds;
+//    }
 
     //플라스크 서버에서 받아온 코스 저장
     public void saveCourses(List<Course> courses, User user) {

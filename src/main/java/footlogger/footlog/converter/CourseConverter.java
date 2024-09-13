@@ -34,7 +34,7 @@ public class CourseConverter {
                 .build();
     }
 
-    public CourseDetailDTO toDetailDTO(Course course, Boolean isSave) {
+    public CourseDetailDTO toDetailDTO(Course course, Boolean isSave, Boolean isComplete) {
 //        List<String> images = course.getImages().stream()
 //                .map(CourseImage::getImage)
 //                .toList();
@@ -47,6 +47,7 @@ public class CourseConverter {
                 .address(course.getAddress())
                 .tel(course.getPhoneNum())
                 .isSave(isSave)
+                .isComplete(isComplete)
                 .build();
     }
 }

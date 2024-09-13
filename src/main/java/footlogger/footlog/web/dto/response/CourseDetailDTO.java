@@ -15,4 +15,5 @@ public class CourseDetailDTO {
     private String address;
     private String tel;
     private Boolean isSave;
+    private Boolean isComplete;
 }
