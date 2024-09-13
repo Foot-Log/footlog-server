@@ -196,4 +196,16 @@ public class CourseService {
                         .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
                 .collect(Collectors.toList());
     }
+
+    //완주한 코스 반환
+    public List<CourseResponseDTO> getCompleteCourse(String token) {
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        return logRepository.findLogByUserId(user.getId()).stream()
+                .map(Log::getCourse)
+                .map(course -> courseConverter
+                        .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
+                .toList();
+    }
 }

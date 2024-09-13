@@ -118,6 +118,14 @@ public class CourseController {
         return ApiResponse.onSuccess(courseService.getSaveCourse(token));
     }
 
+    @Operation(summary = "완주한 코스 조회")
+    @GetMapping(value = "/complete_course")
+    public ApiResponse<List<CourseResponseDTO>> getCompleteCourse(
+            @RequestHeader String token
+    ) {
+        return ApiResponse.onSuccess(courseService.getCompleteCourse(token));
+    }
+
     @Operation( summary = "이미지 업로드 테스트")
     @PostMapping(value = "/s3/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> s3Upload(@RequestParam(value = "image") MultipartFile image) {
