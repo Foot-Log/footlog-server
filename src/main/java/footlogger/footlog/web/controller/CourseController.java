@@ -103,6 +103,14 @@ public class CourseController {
         return ApiResponse.onSuccess(areaService.getAreaCodes());
     }
 
+    @Operation(summary = "저장한 코스 조회")
+    @GetMapping(value = "/save_list")
+    public ApiResponse<List<CourseResponseDTO>> getSaveCourse(
+            @RequestHeader String token
+    ) {
+        return ApiResponse.onSuccess(courseService.getSaveCourse(token));
+    }
+
     @Operation( summary = "이미지 업로드 테스트")
     @PostMapping(value = "/s3/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> s3Upload(@RequestParam(value = "image") MultipartFile image) {

@@ -33,10 +33,7 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<CheckCourse> checkCourseList = new ArrayList<>();
 
-    @Builder.Default
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
-    private List<CourseImage> images = new ArrayList<>();
-
+    private String image;
     private String location;
     private String name;
     private String content;
