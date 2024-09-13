@@ -10,9 +10,10 @@ import java.util.List;
 public class CourseDetailDTO {
     private Long course_id;
     private String name;
-    private List<String> image;
+    private String image;
     private String summary;
     private String address;
     private String tel;
     private Boolean isSave;
+    private Boolean isComplete;
 }

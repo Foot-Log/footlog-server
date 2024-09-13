@@ -3,14 +3,8 @@ package footlogger.footlog.service;
 import footlogger.footlog.converter.AreaConverter;
 import footlogger.footlog.converter.CourseConverter;
 import footlogger.footlog.converter.NaverBlogConverter;
-import footlogger.footlog.domain.Course;
-import footlogger.footlog.domain.Log;
-import footlogger.footlog.domain.SaveCourse;
-import footlogger.footlog.domain.User;
-import footlogger.footlog.repository.CourseRepository;
-import footlogger.footlog.repository.LogRepository;
-import footlogger.footlog.repository.SaveRepository;
-import footlogger.footlog.repository.UserRepository;
+import footlogger.footlog.domain.*;
+import footlogger.footlog.repository.*;
 import footlogger.footlog.utils.NaverBlog;
 import footlogger.footlog.utils.RecommendSystem;
 import footlogger.footlog.web.dto.response.*;
@@ -41,13 +35,14 @@ public class CourseService {
     private final LogRepository logRepository;
     private final RecommendSystem recommendSystem;
     private final SaveService saveService;
+    private final RecommendRepository recommendRepository;
+    private final LogService logService;
 
     //지역기반으로 코스를 받아 옴
-    public List<CourseResponseDTO> getByAreaName(String token, String areaName) {
+    public List<CourseResponseDTO> getByAreaName(String token, Long areaCode) {
         User user = userRepository.findByAccessToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
-        int areaCode = areaConverter.getCodeByAreaName(areaName);
         List<Course> courses = courseRepository.findByAreaCode(areaCode);
 
 
@@ -65,8 +60,9 @@ public class CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new IllegalArgumentException("코스를 찾을 수 없습니다."));
         Boolean isSave = saveService.getSaveStatus(course.getId(), user.getId());
+        Boolean isComplete = logService.getCompleteStatus(user.getId(), course.getId());
 
-        return courseConverter.toDetailDTO(course, isSave);
+        return courseConverter.toDetailDTO(course, isSave, isComplete);
     }
 
     //클릭 때 마다 코스를 저장하고 취소하는 토글 기능
@@ -150,16 +146,47 @@ public class CourseService {
                 .collect(Collectors.toList());
     }
 
+    //테스트
+//    public List<Long> analyzePreference(String token, PreferenceRequestBody request) {
+//        User user = userRepository.findByAccessToken(token)
+//                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+//
+//        List<Long> courseIds = recommendSystem.getRecommendations(request);
+//
+//        List<Course> courses = courseIds.stream()
+//                .map(courseRepository::findById)
+//                .filter(Optional::isPresent)
+//                .map(Optional::get)
+//                .toList();
+//
+//        //서버에 저장
+//        saveCourses(courses, user);
+//
+//        return courseIds;
+//    }
+
     //플라스크 서버에서 받아온 코스 저장
     public void saveCourses(List<Course> courses, User user) {
         for(Course course : courses) {
-            SaveCourse saveCourse = new SaveCourse(null, course, user);
-            saveRepository.save(saveCourse);
+            RecommendCourse recommendCourse = new RecommendCourse(null, course, user);
+            recommendRepository.save(recommendCourse);
         }
     }
 
-    //저장되어 있는 추천 코스 반환
+    //디비에 있는 있는 추천 코스 반환
     public List<CourseResponseDTO> getRecommendCourse(String token) {
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        return recommendRepository.findByUserId(user.getId()).stream()
+                .map(RecommendCourse::getCourse)
+                .map(course -> courseConverter
+                        .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
+                .collect(Collectors.toList());
+    }
+
+    //저장한 코스 반환
+    public List<CourseResponseDTO> getSaveCourse(String token) {
         User user = userRepository.findByAccessToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
@@ -168,5 +195,17 @@ public class CourseService {
                 .map(course -> courseConverter
                         .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
                 .collect(Collectors.toList());
+    }
+
+    //완주한 코스 반환
+    public List<CourseResponseDTO> getCompleteCourse(String token) {
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        return logRepository.findLogByUserId(user.getId()).stream()
+                .map(Log::getCourse)
+                .map(course -> courseConverter
+                        .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
+                .toList();
     }
 }

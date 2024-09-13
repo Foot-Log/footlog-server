@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class CourseIdDTO {
-    private Long courseId;
+public class LogIdDTO {
+    private Long logId;
 }

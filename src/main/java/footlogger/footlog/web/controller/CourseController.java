@@ -1,7 +1,8 @@
 package footlogger.footlog.web.controller;
 
-import footlogger.footlog.domain.Course;
+import footlogger.footlog.converter.AreaConverter;
 import footlogger.footlog.payload.ApiResponse;
+import footlogger.footlog.service.AreaService;
 import footlogger.footlog.service.CourseService;
 import footlogger.footlog.service.S3ImageService;
 import footlogger.footlog.service.SaveService;
@@ -10,38 +11,48 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/course")
+@RequestMapping("/course")
 @RequiredArgsConstructor
 public class CourseController {
     private final CourseService courseService;
     private final SaveService saveService;
     private final S3ImageService s3ImageService;
+    private final AreaConverter areaConverter;
+    private final AreaService areaService;
 
     @Operation(summary = "지역 선택 시 해당 코스 반환")
-    @GetMapping("/area/{area_name}")
+    @GetMapping("/area/{areaCode}")
     public ApiResponse<List<CourseResponseDTO>> coursesFromArea(
             @RequestHeader String token,
-            @PathVariable String area_name
+            @PathVariable Long areaCode
     ) {
         //임시 유저값
-        List<CourseResponseDTO> courses = courseService.getByAreaName(token, area_name);
+        List<CourseResponseDTO> courses = courseService.getByAreaName(token, areaCode);
 
         return ApiResponse.onSuccess(courses);
     }
+
+//    @Operation(summary = "선호도 코스 분석 : 테스트 용")
+//    @PostMapping("/analyze")
+//    public ApiResponse<List<Long>> analyzePreference(
+//            @RequestHeader String token,
+//            @RequestBody PreferenceRequestBody requestBody
+//            ) {
+//        return ApiResponse.onSuccess(courseService.analyzePreference(token, requestBody));
+//    }
 
     @Operation(summary = "선호도 코스 분석")
     @PostMapping("/analyze")
     public ApiResponse<List<CourseResponseDTO>> analyzePreference(
             @RequestHeader String token,
             @RequestBody PreferenceRequestBody requestBody
-            ) {
+    ) {
         return ApiResponse.onSuccess(courseService.analyzePreference(token, requestBody));
     }
 
@@ -85,12 +96,34 @@ public class CourseController {
 
     @Operation(summary = "코스 완주하기")
     @PostMapping(value = "/complete/{course_id}")
-    public ApiResponse<CourseIdDTO> completeCourse(
+    public ApiResponse<LogIdDTO> completeCourse(
             @RequestHeader String token,
             @PathVariable(value = "course_id") Long course_id
     ) {
-        return ApiResponse.onSuccess(CourseIdDTO.builder()
-                        .courseId(courseService.completeCourse(token, course_id)).build());
+        return ApiResponse.onSuccess(LogIdDTO.builder()
+                        .logId(courseService.completeCourse(token, course_id)).build());
+    }
+
+    @Operation(summary = "지역 코드 리스트 반환")
+    @GetMapping(value = "/area_code")
+    public ApiResponse<List<AreaCodeDTO>> getAreaCodes() {
+        return ApiResponse.onSuccess(areaService.getAreaCodes());
+    }
+
+    @Operation(summary = "저장한 코스 조회")
+    @GetMapping(value = "/save_list")
+    public ApiResponse<List<CourseResponseDTO>> getSaveCourse(
+            @RequestHeader String token
+    ) {
+        return ApiResponse.onSuccess(courseService.getSaveCourse(token));
+    }
+
+    @Operation(summary = "완주한 코스 조회")
+    @GetMapping(value = "/complete_course")
+    public ApiResponse<List<CourseResponseDTO>> getCompleteCourse(
+            @RequestHeader String token
+    ) {
+        return ApiResponse.onSuccess(courseService.getCompleteCourse(token));
     }
 
     @Operation( summary = "이미지 업로드 테스트")
