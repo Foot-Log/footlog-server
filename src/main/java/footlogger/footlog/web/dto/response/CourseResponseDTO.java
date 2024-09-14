@@ -9,7 +9,7 @@ import java.util.List;
 @Builder
 public class CourseResponseDTO {
     private Long course_id;
-    private List<String> image;
+    private String image;
     private String area;
     private String name;
     private Boolean isSave;

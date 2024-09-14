@@ -21,32 +21,33 @@ public class CourseConverter {
 
     public CourseResponseDTO toResponseDTO(Course course, Boolean isSave) {
         String area = areaConverter.getAreaNameByCode(course.getAreaCode());
-        List<String> images = course.getImages().stream()
-                .map(CourseImage::getImage)
-                .toList();
+//        List<String> images = course.getImages().stream()
+//                .map(CourseImage::getImage)
+//                .toList();
 
         return CourseResponseDTO.builder()
                 .course_id(course.getId())
-                .image(images)
+                .image(course.getImage())
                 .area(area)
                 .name(course.getName())
                 .isSave(isSave)
                 .build();
     }
 
-    public CourseDetailDTO toDetailDTO(Course course, Boolean isSave) {
-        List<String> images = course.getImages().stream()
-                .map(CourseImage::getImage)
-                .toList();
+    public CourseDetailDTO toDetailDTO(Course course, Boolean isSave, Boolean isComplete) {
+//        List<String> images = course.getImages().stream()
+//                .map(CourseImage::getImage)
+//                .toList();
 
         return CourseDetailDTO.builder()
                 .course_id(course.getId())
                 .name(course.getName())
-                .image(images)
+                .image(course.getImage())
                 .summary(course.getContent())
                 .address(course.getAddress())
                 .tel(course.getPhoneNum())
                 .isSave(isSave)
+                .isComplete(isComplete)
                 .build();
     }
 }

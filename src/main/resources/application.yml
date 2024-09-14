@@ -24,6 +24,11 @@ spring:
       resolve-lazily: true
       enabled: true
 
+#
+#server:
+#  servlet:
+#    context-path: /api
+
   data:
     redis:
       host: localhost
