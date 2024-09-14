@@ -32,8 +32,9 @@ public class CourseController {
             @RequestHeader("Authorization") String token,
             @PathVariable Long areaCode
     ) {
+        String tokenWithoutBearer = token.substring(7);
         //임시 유저값
-        List<CourseResponseDTO> courses = courseService.getByAreaName(token, areaCode);
+        List<CourseResponseDTO> courses = courseService.getByAreaName(tokenWithoutBearer, areaCode);
 
         return ApiResponse.onSuccess(courses);
     }
@@ -53,7 +54,8 @@ public class CourseController {
             @RequestHeader("Authorization") String token,
             @RequestBody PreferenceRequestBody requestBody
     ) {
-        return ApiResponse.onSuccess(courseService.analyzePreference(token, requestBody));
+        String tokenWithoutBearer = token.substring(7);
+        return ApiResponse.onSuccess(courseService.analyzePreference(tokenWithoutBearer, requestBody));
     }
 
     @Operation(summary = "추천 코스 조회")
@@ -61,7 +63,8 @@ public class CourseController {
     public ApiResponse<List<CourseResponseDTO>> recommendCourse(
             @RequestHeader("Authorization") String token
     ) {
-        return ApiResponse.onSuccess(courseService.getRecommendCourse(token));
+        String tokenWithoutBearer = token.substring(7);
+        return ApiResponse.onSuccess(courseService.getRecommendCourse(tokenWithoutBearer));
     }
 
     @Operation(summary = "코스 클릭 시 상세 정보 조회")
@@ -70,8 +73,9 @@ public class CourseController {
             @RequestHeader("Authorization") String token,
             @PathVariable Long course_id
     ) {
+        String tokenWithoutBearer = token.substring(7);
         //임시 유저값
-        CourseDetailDTO course = courseService.getCourseDetail(token, course_id);
+        CourseDetailDTO course = courseService.getCourseDetail(tokenWithoutBearer, course_id);
 
         return ApiResponse.onSuccess(course);
     }
@@ -82,15 +86,18 @@ public class CourseController {
             @RequestHeader("Authorization") String token,
             @PathVariable Long course_id
     ) {
-        SaveStatusDTO dto = courseService.toggleSaveCourse(token, course_id);
+        String tokenWithoutBearer = token.substring(7);
+        SaveStatusDTO dto = courseService.toggleSaveCourse(tokenWithoutBearer, course_id);
         return ApiResponse.onSuccess(dto);
     }
 
     @Operation(summary = "코스 네이버 포스트 조회")
     @GetMapping(value = "/post/{course_id}")
     public ApiResponse<List<NaverBlogDTO>> getNaverBlogPost(
+            @RequestHeader("Authorization") String token,
             @PathVariable(value = "course_id")Long course_id
     ) {
+        String tokenWithoutBearer = token.substring(7);
         return ApiResponse.onSuccess(courseService.getNaverBlogs(course_id));
     }
 
@@ -100,8 +107,9 @@ public class CourseController {
             @RequestHeader("Authorization") String token,
             @PathVariable(value = "course_id") Long course_id
     ) {
+        String tokenWithoutBearer = token.substring(7);
         return ApiResponse.onSuccess(LogIdDTO.builder()
-                        .logId(courseService.completeCourse(token, course_id)).build());
+                        .logId(courseService.completeCourse(tokenWithoutBearer, course_id)).build());
     }
 
     @Operation(summary = "지역 코드 리스트 반환")
@@ -109,6 +117,7 @@ public class CourseController {
     public ApiResponse<List<AreaCodeDTO>> getAreaCodes(
             @RequestHeader("Authorization") String token
     ) {
+        String tokenWithoutBearer = token.substring(7);
         return ApiResponse.onSuccess(areaService.getAreaCodes());
     }
 
@@ -117,7 +126,8 @@ public class CourseController {
     public ApiResponse<List<CourseResponseDTO>> getSaveCourse(
             @RequestHeader("Authorization") String token
     ) {
-        return ApiResponse.onSuccess(courseService.getSaveCourse(token));
+        String tokenWithoutBearer = token.substring(7);
+        return ApiResponse.onSuccess(courseService.getSaveCourse(tokenWithoutBearer));
     }
 
     @Operation(summary = "완주한 코스 조회")
@@ -125,7 +135,8 @@ public class CourseController {
     public ApiResponse<List<CourseResponseDTO>> getCompleteCourse(
             @RequestHeader("Authorization") String token
     ) {
-        return ApiResponse.onSuccess(courseService.getCompleteCourse(token));
+        String tokenWithoutBearer = token.substring(7);
+        return ApiResponse.onSuccess(courseService.getCompleteCourse(tokenWithoutBearer));
     }
 
     @Operation( summary = "이미지 업로드 테스트")
