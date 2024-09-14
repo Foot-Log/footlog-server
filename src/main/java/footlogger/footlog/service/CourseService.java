@@ -43,14 +43,21 @@ public class CourseService {
         User user = userRepository.findByAccessToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
-        List<Course> courses = courseRepository.findByAreaCode(areaCode);
+        //지역 전체를 뜻하는 0번을 입력할 경우 전체 지역에서 50개를 가져옴
+        if (areaCode == 0) {
+            return courseRepository.findAllOrderByTotalSaves(50).stream()
+                    .map(course -> courseConverter
+                            .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
+                    .toList();
+        }
+        //특정 지역 코드를 입력한 경우
+        else {
+            return courseRepository.findByAreaCode(areaCode).stream()
+                    .map(course -> courseConverter
+                            .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
+                    .collect(Collectors.toList());
+        }
 
-
-
-        return courses.stream()
-                .map(course -> courseConverter
-                        .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
-                .collect(Collectors.toList());
     }
 
     //클릭 시 상세 조회
@@ -189,6 +196,17 @@ public class CourseService {
 
         return logRepository.findLogByUserId(user.getId()).stream()
                 .map(Log::getCourse)
+                .map(course -> courseConverter
+                        .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
+                .toList();
+    }
+
+    //최근 핫한 코스
+    public List<CourseResponseDTO> getHotCourses(String token) {
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        return courseRepository.findAllOrderByTotalSaves(10).stream()
                 .map(course -> courseConverter
                         .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
                 .toList();

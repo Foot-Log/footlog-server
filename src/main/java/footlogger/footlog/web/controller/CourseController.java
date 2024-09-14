@@ -139,6 +139,15 @@ public class CourseController {
         return ApiResponse.onSuccess(courseService.getCompleteCourse(tokenWithoutBearer));
     }
 
+    @Operation(summary = "최근 핫한 코스 조회")
+    @GetMapping(value = "/hot")
+    public ApiResponse<List<CourseResponseDTO>> getHotCourses(
+            @RequestHeader("Authorization") String token
+    ) {
+        String tokenWithoutBearer = token.substring(7);
+        return ApiResponse.onSuccess(courseService.getHotCourses(tokenWithoutBearer));
+    }
+
     @Operation( summary = "이미지 업로드 테스트")
     @PostMapping(value = "/s3/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> s3Upload(@RequestParam(value = "image") MultipartFile image) {
