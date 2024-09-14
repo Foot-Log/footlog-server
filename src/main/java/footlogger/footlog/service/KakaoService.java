@@ -166,7 +166,19 @@ public class KakaoService {
 
         if (existingUser != null) {
             // 이미 유저가 존재하면 엑세스 토큰과 리프레쉬 토큰을 발급
-            return jwtTokenProvider.generateTokens(existingUser.getId());
+            //return jwtTokenProvider.generateTokens(existingUser.getId());
+            // 이미 유저가 존재하면 엑세스 토큰과 리프레쉬 토큰을 발급
+            UserResponseDto.LoginResultDto tokens = jwtTokenProvider.generateTokens(existingUser.getId());
+
+            // 발급된 토큰을 기존 유저 객체에 업데이트
+            existingUser.setAccessToken(tokens.getAccessToken());
+            existingUser.setRefreshToken(tokens.getRefreshToken());
+
+            // DB에 업데이트
+            userRepository.save(existingUser);
+
+            return tokens;
+
         } else {
             // 유저가 없으면 회원가입 처리 후 토큰 발급
             User newUser = User.builder()
