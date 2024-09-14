@@ -27,7 +27,8 @@ public class SearchController {
     public ApiResponse<List<SearchLogDTO>> findRecentSearchLog(
             @RequestHeader("Authorization") String token
     ) {
-        List<SearchLogDTO> recentSearchLogList = searchService.getRecentSearchLogs(token);
+        String tokenWithoutBearer = token.substring(7);
+        List<SearchLogDTO> recentSearchLogList = searchService.getRecentSearchLogs(tokenWithoutBearer);
 
         return ApiResponse.onSuccess(recentSearchLogList);
     }
@@ -38,8 +39,9 @@ public class SearchController {
             @RequestHeader("Authorization") String token,
             @RequestBody SearchLogDTO requestBody
     ) {
+        String tokenWithoutBearer = token.substring(7);
         return ApiResponse.onSuccess(CourseCountDTO.builder()
-                        .Count(searchService.deleteRecentSearchLog(token, requestBody))
+                        .Count(searchService.deleteRecentSearchLog(tokenWithoutBearer, requestBody))
                 .build());
     }
 
@@ -49,8 +51,9 @@ public class SearchController {
             @RequestHeader("Authorization") String token,
             @PathVariable("keyword") String keyword
     ) {
+        String tokenWithoutBearer = token.substring(7);
         searchService.saveRecentSearchLog(token, keyword);
 
-        return ApiResponse.onSuccess(courseService.getByAreaName(token, 1L));
+        return ApiResponse.onSuccess(courseService.getByAreaName(tokenWithoutBearer, 1L));
     }
 }
