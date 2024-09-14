@@ -29,7 +29,7 @@ public class CourseController {
     @Operation(summary = "지역 선택 시 해당 코스 반환")
     @GetMapping("/area/{areaCode}")
     public ApiResponse<List<CourseResponseDTO>> coursesFromArea(
-            @RequestHeader String token,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long areaCode
     ) {
         //임시 유저값
@@ -50,7 +50,7 @@ public class CourseController {
     @Operation(summary = "선호도 코스 분석")
     @PostMapping("/analyze")
     public ApiResponse<List<CourseResponseDTO>> analyzePreference(
-            @RequestHeader String token,
+            @RequestHeader("Authorization") String token,
             @RequestBody PreferenceRequestBody requestBody
     ) {
         return ApiResponse.onSuccess(courseService.analyzePreference(token, requestBody));
@@ -59,7 +59,7 @@ public class CourseController {
     @Operation(summary = "추천 코스 조회")
     @GetMapping("/recommend")
     public ApiResponse<List<CourseResponseDTO>> recommendCourse(
-            @RequestHeader String token
+            @RequestHeader("Authorization") String token
     ) {
         return ApiResponse.onSuccess(courseService.getRecommendCourse(token));
     }
@@ -67,7 +67,7 @@ public class CourseController {
     @Operation(summary = "코스 클릭 시 상세 정보 조회")
     @GetMapping("/detail/{course_id}")
     public ApiResponse<CourseDetailDTO> courseDetail(
-            @RequestHeader String token,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long course_id
     ) {
         //임시 유저값
@@ -79,7 +79,7 @@ public class CourseController {
     @Operation(summary = "코스 저장 버튼 클릭 시 저장/취소 토글 기능")
     @PostMapping("/save/{course_id}")
     public ApiResponse<SaveStatusDTO> saveCourse(
-            @RequestHeader String token,
+            @RequestHeader("Authorization") String token,
             @PathVariable Long course_id
     ) {
         SaveStatusDTO dto = courseService.toggleSaveCourse(token, course_id);
@@ -97,7 +97,7 @@ public class CourseController {
     @Operation(summary = "코스 완주하기")
     @PostMapping(value = "/complete/{course_id}")
     public ApiResponse<LogIdDTO> completeCourse(
-            @RequestHeader String token,
+            @RequestHeader("Authorization") String token,
             @PathVariable(value = "course_id") Long course_id
     ) {
         return ApiResponse.onSuccess(LogIdDTO.builder()
@@ -107,7 +107,7 @@ public class CourseController {
     @Operation(summary = "지역 코드 리스트 반환")
     @GetMapping(value = "/area_code")
     public ApiResponse<List<AreaCodeDTO>> getAreaCodes(
-            @RequestHeader String token
+            @RequestHeader("Authorization") String token
     ) {
         return ApiResponse.onSuccess(areaService.getAreaCodes());
     }
@@ -115,7 +115,7 @@ public class CourseController {
     @Operation(summary = "저장한 코스 조회")
     @GetMapping(value = "/save_list")
     public ApiResponse<List<CourseResponseDTO>> getSaveCourse(
-            @RequestHeader String token
+            @RequestHeader("Authorization") String token
     ) {
         return ApiResponse.onSuccess(courseService.getSaveCourse(token));
     }
@@ -123,7 +123,7 @@ public class CourseController {
     @Operation(summary = "완주한 코스 조회")
     @GetMapping(value = "/complete_course")
     public ApiResponse<List<CourseResponseDTO>> getCompleteCourse(
-            @RequestHeader String token
+            @RequestHeader("Authorization") String token
     ) {
         return ApiResponse.onSuccess(courseService.getCompleteCourse(token));
     }
