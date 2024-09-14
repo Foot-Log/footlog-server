@@ -129,6 +129,10 @@ public class CourseService {
         User user = userRepository.findByAccessToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
+        //기존에 저장되어 있는 코스가 있으면 삭제
+        recommendRepository.deleteByUserId(user.getId());
+
+        //플라스크 서버에서 코스 분석 후 반환
         List<Long> courseIds = recommendSystem.getRecommendations(request);
 
         List<Course> courses = courseIds.stream()
@@ -145,25 +149,6 @@ public class CourseService {
                         .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
                 .collect(Collectors.toList());
     }
-
-    //테스트
-//    public List<Long> analyzePreference(String token, PreferenceRequestBody request) {
-//        User user = userRepository.findByAccessToken(token)
-//                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-//
-//        List<Long> courseIds = recommendSystem.getRecommendations(request);
-//
-//        List<Course> courses = courseIds.stream()
-//                .map(courseRepository::findById)
-//                .filter(Optional::isPresent)
-//                .map(Optional::get)
-//                .toList();
-//
-//        //서버에 저장
-//        saveCourses(courses, user);
-//
-//        return courseIds;
-//    }
 
     //플라스크 서버에서 받아온 코스 저장
     public void saveCourses(List<Course> courses, User user) {
