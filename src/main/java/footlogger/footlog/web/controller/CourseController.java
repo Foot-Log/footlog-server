@@ -106,7 +106,9 @@ public class CourseController {
 
     @Operation(summary = "지역 코드 리스트 반환")
     @GetMapping(value = "/area_code")
-    public ApiResponse<List<AreaCodeDTO>> getAreaCodes() {
+    public ApiResponse<List<AreaCodeDTO>> getAreaCodes(
+            @RequestHeader String token
+    ) {
         return ApiResponse.onSuccess(areaService.getAreaCodes());
     }
 
