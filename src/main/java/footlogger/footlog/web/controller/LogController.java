@@ -23,9 +23,9 @@ public class LogController {
 
     @Operation(summary = "완주한 코스 리스트")
     @GetMapping("/completedList")
-    public ApiResponse<LogResponseDto.LogListDto> getCompletedList(@RequestHeader("Authorization") String token){
+    public ApiResponse<List<LogResponseDto.LogDto>> getCompletedList(@RequestHeader("Authorization") String token){
         String tokenWithoutBearer = token.substring(7);
-        LogResponseDto.LogListDto response = logService.getCompletedList(tokenWithoutBearer);
+        List<LogResponseDto.LogDto> response = logService.getCompletedList(tokenWithoutBearer);
         return ApiResponse.onSuccess(response);
    }
     @Operation(summary = "로그 기록보기")
