@@ -43,14 +43,21 @@ public class CourseService {
         User user = userRepository.findByAccessToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
-        List<Course> courses = courseRepository.findByAreaCode(areaCode);
+        //지역 전체를 뜻하는 0번을 입력할 경우 전체 지역에서 50개를 가져옴
+        if (areaCode == 0) {
+            return courseRepository.findAllOrderByTotalSaves(50).stream()
+                    .map(course -> courseConverter
+                            .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
+                    .toList();
+        }
+        //특정 지역 코드를 입력한 경우
+        else {
+            return courseRepository.findByAreaCode(areaCode).stream()
+                    .map(course -> courseConverter
+                            .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
+                    .collect(Collectors.toList());
+        }
 
-
-
-        return courses.stream()
-                .map(course -> courseConverter
-                        .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
-                .collect(Collectors.toList());
     }
 
     //클릭 시 상세 조회
@@ -129,6 +136,10 @@ public class CourseService {
         User user = userRepository.findByAccessToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
+        //기존에 저장되어 있는 코스가 있으면 삭제
+        recommendRepository.deleteByUserId(user.getId());
+
+        //플라스크 서버에서 코스 분석 후 반환
         List<Long> courseIds = recommendSystem.getRecommendations(request);
 
         List<Course> courses = courseIds.stream()
@@ -145,25 +156,6 @@ public class CourseService {
                         .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
                 .collect(Collectors.toList());
     }
-
-    //테스트
-//    public List<Long> analyzePreference(String token, PreferenceRequestBody request) {
-//        User user = userRepository.findByAccessToken(token)
-//                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-//
-//        List<Long> courseIds = recommendSystem.getRecommendations(request);
-//
-//        List<Course> courses = courseIds.stream()
-//                .map(courseRepository::findById)
-//                .filter(Optional::isPresent)
-//                .map(Optional::get)
-//                .toList();
-//
-//        //서버에 저장
-//        saveCourses(courses, user);
-//
-//        return courseIds;
-//    }
 
     //플라스크 서버에서 받아온 코스 저장
     public void saveCourses(List<Course> courses, User user) {
@@ -204,6 +196,17 @@ public class CourseService {
 
         return logRepository.findLogByUserId(user.getId()).stream()
                 .map(Log::getCourse)
+                .map(course -> courseConverter
+                        .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
+                .toList();
+    }
+
+    //최근 핫한 코스
+    public List<CourseResponseDTO> getHotCourses(String token) {
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        return courseRepository.findAllOrderByTotalSaves(10).stream()
                 .map(course -> courseConverter
                         .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
                 .toList();

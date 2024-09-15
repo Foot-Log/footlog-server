@@ -17,7 +17,6 @@ import java.util.List;
 @AllArgsConstructor
 public class Course {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "course_id")
     private Long id;
 
@@ -34,19 +33,17 @@ public class Course {
     private List<CheckCourse> checkCourseList = new ArrayList<>();
 
     private String image;
-    private String location;
     private String name;
+    @Lob
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
     private String phoneNum;
-    private String charge;
-    private String openDay;
-    private String homepage;
+    private String phoneName;
     private int areaCode;
     private int sigunguCode;
     private String address;
-
-
-
+    private String createdTime;
+    private String modifiedTime;
     //저장된 수
     @Formula("(SELECT COUNT(sc.user_id) FROM save_course sc WHERE sc.course_id = course_id)")
     private int totalSaves;
