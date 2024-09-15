@@ -148,6 +148,16 @@ public class CourseController {
         return ApiResponse.onSuccess(courseService.getHotCourses(tokenWithoutBearer));
     }
 
+    @Operation(summary = "코스 검색 api")
+    @GetMapping(value = "/search/{keyword}")
+    public ApiResponse<List<CourseResponseDTO>> searchCourse(
+            @RequestHeader("Authorization") String token,
+            @PathVariable(value = "keyword") String keyword
+    ) {
+        String tokenWithoutBearer = token.substring(7);
+        return ApiResponse.onSuccess(courseService.getCourseByKeyowrd(tokenWithoutBearer, keyword));
+    }
+
     @Operation( summary = "이미지 업로드 테스트")
     @PostMapping(value = "/s3/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> s3Upload(@RequestParam(value = "image") MultipartFile image) {

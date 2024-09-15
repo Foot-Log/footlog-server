@@ -16,9 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -207,6 +205,52 @@ public class CourseService {
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         return courseRepository.findAllOrderByTotalSaves(10).stream()
+                .map(course -> courseConverter
+                        .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
+                .toList();
+    }
+
+    //코스 검색 기능
+    public List<CourseResponseDTO> getCourseByKeyowrd(String token, String keyword) {
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        //검색 결과의 최대 개수
+        int totalCount = 20;
+        //코스를 이름 기준으로 검색
+        List<Long> coursesByName = courseRepository.findByNameKeyword(keyword, totalCount).stream()
+                .map(Course::getId)
+                .toList();
+
+        totalCount -= coursesByName.size();
+
+        //주소 기준으로 검색
+        List<Long> coursesByAddress = courseRepository.findByAddressKeyword(keyword, totalCount).stream()
+                .map(Course::getId)
+                .toList();
+
+        totalCount -= coursesByAddress.size();
+
+        //내용 기준으로 검색
+        List<Long> coursesByContent = courseRepository.findByContentKeyword(keyword, totalCount).stream()
+                .map(Course::getId)
+                .toList();
+
+        //세 가지 기준으로 검색한 코스 결과 합치기 : Set으로 중복제거
+        Set<Long> combinedSet = new HashSet<>();
+        combinedSet.addAll(coursesByName);
+        combinedSet.addAll(coursesByAddress);
+        combinedSet.addAll(coursesByContent);
+
+        //리스트로 변경 후 코스로 형변환
+        List<Course> combinedList = new ArrayList<>(combinedSet).stream()
+                .map(courseRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+
+        //반환
+        return combinedList.stream()
                 .map(course -> courseConverter
                         .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
                 .toList();
