@@ -3,6 +3,7 @@ package footlogger.footlog.service;
 import footlogger.footlog.converter.AreaConverter;
 import footlogger.footlog.converter.CourseConverter;
 import footlogger.footlog.converter.NaverBlogConverter;
+import footlogger.footlog.converter.SearchLogConverter;
 import footlogger.footlog.domain.*;
 import footlogger.footlog.repository.*;
 import footlogger.footlog.utils.NaverBlog;
@@ -14,8 +15,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,6 +38,7 @@ public class CourseService {
     private final SaveService saveService;
     private final RecommendRepository recommendRepository;
     private final LogService logService;
+    private final RedisTemplate<String, Long> redisTemplate;
 
     //지역기반으로 코스를 받아 옴
     public List<CourseResponseDTO> getByAreaName(String token, Long areaCode) {
@@ -66,6 +70,8 @@ public class CourseService {
                 .orElseThrow(() -> new IllegalArgumentException("코스를 찾을 수 없습니다."));
         Boolean isSave = saveService.getSaveStatus(course.getId(), user.getId());
         Boolean isComplete = logService.getCompleteStatus(user.getId(), course.getId());
+
+        saveRecentCourse(user, courseId);
 
         return courseConverter.toDetailDTO(course, isSave, isComplete);
     }
@@ -251,6 +257,41 @@ public class CourseService {
 
         //반환
         return combinedList.stream()
+                .map(course -> courseConverter
+                        .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
+                .toList();
+    }
+
+    //최근 확인한 코스 데이터 저장
+    public void saveRecentCourse(User user, Long courseId) {
+
+        //key값 : Course + 유저 id 값
+        String key = "Course" + user.getId();
+
+        Long size = redisTemplate.opsForList().size(key);
+
+        //10개를 넘을 경우 가장 오래된 데이터 삭제
+        if(size == 10) {
+            redisTemplate.opsForList().rightPop(key);
+        }
+
+        redisTemplate.opsForList().leftPush(key, courseId);
+    }
+
+    //최근 확인한 코스 데이터 조회
+    public List<CourseResponseDTO> getRecentCourse(String token) {
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        String key = "Course" + user.getId();
+
+        List<Course> courses = redisTemplate.opsForList().range(key, 0, 10).stream()
+                .map(courseRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+
+        return courses.stream()
                 .map(course -> courseConverter
                         .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
                 .toList();
