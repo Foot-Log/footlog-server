@@ -45,15 +45,13 @@ public class SearchController {
                 .build());
     }
 
-    @Operation(summary = "검색")
+    @Operation(summary = "코스 검색")
     @GetMapping("/course/{keyword}")
     public ApiResponse<List<CourseResponseDTO>> searchCourse(
             @RequestHeader("Authorization") String token,
-            @PathVariable("keyword") String keyword
+            @PathVariable(value = "keyword") String keyword
     ) {
         String tokenWithoutBearer = token.substring(7);
-        searchService.saveRecentSearchLog(token, keyword);
-
-        return ApiResponse.onSuccess(courseService.getByAreaName(tokenWithoutBearer, 1L));
+        return ApiResponse.onSuccess(courseService.getCourseByKeyword(tokenWithoutBearer, keyword));
     }
 }

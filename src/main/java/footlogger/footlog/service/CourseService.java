@@ -3,6 +3,7 @@ package footlogger.footlog.service;
 import footlogger.footlog.converter.AreaConverter;
 import footlogger.footlog.converter.CourseConverter;
 import footlogger.footlog.converter.NaverBlogConverter;
+import footlogger.footlog.converter.SearchLogConverter;
 import footlogger.footlog.domain.*;
 import footlogger.footlog.repository.*;
 import footlogger.footlog.utils.NaverBlog;
@@ -14,11 +15,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +38,8 @@ public class CourseService {
     private final SaveService saveService;
     private final RecommendRepository recommendRepository;
     private final LogService logService;
+    private final RedisTemplate<String, Long> redisTemplate;
+    private final SearchService searchService;
 
     //지역기반으로 코스를 받아 옴
     public List<CourseResponseDTO> getByAreaName(String token, Long areaCode) {
@@ -68,6 +71,8 @@ public class CourseService {
                 .orElseThrow(() -> new IllegalArgumentException("코스를 찾을 수 없습니다."));
         Boolean isSave = saveService.getSaveStatus(course.getId(), user.getId());
         Boolean isComplete = logService.getCompleteStatus(user.getId(), course.getId());
+
+        saveRecentCourse(user, courseId);
 
         return courseConverter.toDetailDTO(course, isSave, isComplete);
     }
@@ -207,6 +212,89 @@ public class CourseService {
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         return courseRepository.findAllOrderByTotalSaves(10).stream()
+                .map(course -> courseConverter
+                        .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
+                .toList();
+    }
+
+    //코스 검색 기능
+    public List<CourseResponseDTO> getCourseByKeyword(String token, String keyword) {
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        searchService.saveRecentSearchLog(user, keyword);
+
+        //검색 결과의 최대 개수
+        int totalCount = 20;
+        //코스를 이름 기준으로 검색
+        List<Long> coursesByName = courseRepository.findByNameKeyword(keyword, totalCount).stream()
+                .map(Course::getId)
+                .toList();
+
+        totalCount -= coursesByName.size();
+
+        //주소 기준으로 검색
+        List<Long> coursesByAddress = courseRepository.findByAddressKeyword(keyword, totalCount).stream()
+                .map(Course::getId)
+                .toList();
+
+        totalCount -= coursesByAddress.size();
+
+        //내용 기준으로 검색
+        List<Long> coursesByContent = courseRepository.findByContentKeyword(keyword, totalCount).stream()
+                .map(Course::getId)
+                .toList();
+
+        //세 가지 기준으로 검색한 코스 결과 합치기 : Set으로 중복제거
+        Set<Long> combinedSet = new HashSet<>();
+        combinedSet.addAll(coursesByName);
+        combinedSet.addAll(coursesByAddress);
+        combinedSet.addAll(coursesByContent);
+
+        //리스트로 변경 후 코스로 형변환
+        List<Course> combinedList = new ArrayList<>(combinedSet).stream()
+                .map(courseRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+
+        //반환
+        return combinedList.stream()
+                .map(course -> courseConverter
+                        .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
+                .toList();
+    }
+
+    //최근 확인한 코스 데이터 저장
+    public void saveRecentCourse(User user, Long courseId) {
+
+        //key값 : Course + 유저 id 값
+        String key = "Course" + user.getId();
+
+        Long size = redisTemplate.opsForList().size(key);
+
+        //10개를 넘을 경우 가장 오래된 데이터 삭제
+        if(size == 10) {
+            redisTemplate.opsForList().rightPop(key);
+        }
+
+        redisTemplate.opsForList().leftPush(key, courseId);
+    }
+
+    //최근 확인한 코스 데이터 조회
+    public List<CourseResponseDTO> getRecentCourse(String token) {
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        String key = "Course" + user.getId();
+
+        List<Course> courses = redisTemplate.opsForList().range(key, 0, 10).stream()
+                .map(courseRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+
+        return courses.stream()
                 .map(course -> courseConverter
                         .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
                 .toList();
