@@ -39,6 +39,7 @@ public class CourseService {
     private final RecommendRepository recommendRepository;
     private final LogService logService;
     private final RedisTemplate<String, Long> redisTemplate;
+    private final SearchService searchService;
 
     //지역기반으로 코스를 받아 옴
     public List<CourseResponseDTO> getByAreaName(String token, Long areaCode) {
@@ -217,9 +218,11 @@ public class CourseService {
     }
 
     //코스 검색 기능
-    public List<CourseResponseDTO> getCourseByKeyowrd(String token, String keyword) {
+    public List<CourseResponseDTO> getCourseByKeyword(String token, String keyword) {
         User user = userRepository.findByAccessToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        searchService.saveRecentSearchLog(user, keyword);
 
         //검색 결과의 최대 개수
         int totalCount = 20;

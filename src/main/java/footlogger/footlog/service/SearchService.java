@@ -22,16 +22,14 @@ public class SearchService {
     private final RedisTemplate<String, SearchLog> redisTemplate;
 
     //검색어 저장 기능
-    public void saveRecentSearchLog(String token, String keword) {
-        User user = userRepository.findByAccessToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+    public void saveRecentSearchLog(User user, String keyword) {
 
         String now = LocalDateTime.now().toString();
 
         //key값 : SearchLog + 유저 id 값
         String key = "SearchLog" + user.getId();
         SearchLog value = SearchLog.builder()
-                .log(keword)
+                .log(keyword)
                 .createdAt(now)
                 .build();
 
