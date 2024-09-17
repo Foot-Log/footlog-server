@@ -46,9 +46,9 @@ public class CourseService {
         User user = userRepository.findByAccessToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
-        //지역 전체를 뜻하는 0번을 입력할 경우 전체 지역에서 50개를 가져옴
+        //지역 전체를 뜻하는 0번을 입력할 경우 전체 코스를 가져옴
         if (areaCode == 0) {
-            return courseRepository.findAllOrderByTotalSaves(50).stream()
+            return courseRepository.findAllOrderByTotalSaves(182).stream()
                     .map(course -> courseConverter
                             .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
                     .toList();

@@ -1,6 +1,8 @@
 package footlogger.footlog.converter;
 
+import footlogger.footlog.domain.Sigungu;
 import footlogger.footlog.web.dto.response.AreaCodeDTO;
+import footlogger.footlog.web.dto.response.SigunguCodeDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -66,6 +68,14 @@ public class AreaConverter {
         }
 
         return areaCodeDTOList;
+    }
+
+    public SigunguCodeDTO getSigunguCodeDTOByCodes(Sigungu sigungu) {
+        return SigunguCodeDTO.builder()
+                .areaCode(sigungu.getAreaCode())
+                .sigunguCode(sigungu.getSigunguCode())
+                .sigunguName(sigungu.getSigunguName())
+                .build();
     }
 }
 
