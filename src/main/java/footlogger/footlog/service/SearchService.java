@@ -53,12 +53,11 @@ public class SearchService {
                 .collect(Collectors.toList());
     }
 
-    public Long deleteRecentSearchLog(String token, SearchLogDTO request) {
+    public Long deleteRecentSearchLog(String token, String keyword) {
         User user = userRepository.findByAccessToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         String key = "SearchLog" + user.getId();
-        String keyword = request.getLog();
 
         long count = redisTemplate.opsForList().remove(key, 1, keyword);
 

@@ -6,5 +6,5 @@ import lombok.Getter;
 @Getter
 @Builder
 public class SearchLogDTO {
-    private String log;
+    private String keyword;
 }

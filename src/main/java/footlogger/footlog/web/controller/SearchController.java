@@ -37,14 +37,14 @@ public class SearchController {
     }
 
     @Operation(summary = "검색어 삭제")
-    @PatchMapping("/delete")
+    @PatchMapping("/delete/{keyword}")
     public ApiResponse<CourseCountDTO> deleteSearchLog(
             @RequestHeader("Authorization") String token,
-            @RequestBody SearchLogDTO requestBody
+            @PathVariable(value = "keyword") String keyword
     ) {
         String tokenWithoutBearer = token.substring(7);
         return ApiResponse.onSuccess(CourseCountDTO.builder()
-                        .Count(searchService.deleteRecentSearchLog(tokenWithoutBearer, requestBody))
+                        .Count(searchService.deleteRecentSearchLog(tokenWithoutBearer, keyword))
                 .build());
     }
 

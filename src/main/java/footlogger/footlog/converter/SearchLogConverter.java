@@ -9,7 +9,7 @@ public class SearchLogConverter {
 
     public static SearchLogDTO toDTO(String keyword) {
         return SearchLogDTO.builder()
-                .log(keyword)
+                .keyword(keyword)
                 .build();
     }
 }
