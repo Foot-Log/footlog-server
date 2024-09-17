@@ -7,5 +7,4 @@ import lombok.Getter;
 @Builder
 public class SearchLogDTO {
     private String log;
-    private String CreatedAt;
 }

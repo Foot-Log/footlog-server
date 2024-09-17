@@ -271,6 +271,8 @@ public class CourseService {
         //key값 : Course + 유저 id 값
         String key = "Course" + user.getId();
 
+        redisTemplate.opsForList().remove(key, 1, courseId);
+
         Long size = redisTemplate.opsForList().size(key);
 
         //10개를 넘을 경우 가장 오래된 데이터 삭제

@@ -19,19 +19,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SearchService {
     private final UserRepository userRepository;
-    private final RedisTemplate<String, SearchLog> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     //검색어 저장 기능
     public void saveRecentSearchLog(User user, String keyword) {
 
-        String now = LocalDateTime.now().toString();
-
         //key값 : SearchLog + 유저 id 값
         String key = "SearchLog" + user.getId();
-        SearchLog value = SearchLog.builder()
-                .log(keyword)
-                .createdAt(now)
-                .build();
+
+        redisTemplate.opsForList().remove(key, 1, keyword);
 
         Long size = redisTemplate.opsForList().size(key);
 
@@ -40,7 +36,7 @@ public class SearchService {
             redisTemplate.opsForList().rightPop(key);
         }
 
-        redisTemplate.opsForList().leftPush(key, value);
+        redisTemplate.opsForList().leftPush(key, keyword);
     }
 
     //검색 기록 조회
@@ -50,7 +46,7 @@ public class SearchService {
 
         String key = "SearchLog" + user.getId();
 
-        List<SearchLog> logs = redisTemplate.opsForList().range(key, 0, 10);
+        List<String> logs = redisTemplate.opsForList().range(key, 0, 10);
 
         return logs.stream()
                 .map(SearchLogConverter::toDTO)
@@ -62,12 +58,9 @@ public class SearchService {
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         String key = "SearchLog" + user.getId();
-        SearchLog value = SearchLog.builder()
-                .log(request.getLog())
-                .createdAt(request.getCreatedAt())
-                .build();
+        String keyword = request.getLog();
 
-        long count = redisTemplate.opsForList().remove(key, 1, value);
+        long count = redisTemplate.opsForList().remove(key, 1, keyword);
 
         if(count == 0) {
             throw new IllegalArgumentException("검색어가 존재하지 않습니다.");

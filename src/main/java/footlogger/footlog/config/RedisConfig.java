@@ -27,18 +27,6 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, SearchLog> SearchLogRedis() {
-        RedisTemplate<String, SearchLog> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(SearchLog.class));
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(SearchLog.class));
-
-        return redisTemplate;
-    }
-
-    @Bean
     public RedisTemplate<String, Long> CourseRedis() {
         RedisTemplate<String, Long> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
