@@ -15,10 +15,10 @@ public class UserConverter {
                 .level(user.getLevel())
                 .stampCount(user.getStampCount())
                 .profileImg(user.getProfileImg())
-                .saveCourseList(user.getSaveCourseList().stream()
-                        .map(UserConverter::toSaveCourse).collect(Collectors.toList()))
-                .checkCourseList(user.getCheckCourseList().stream()
-                        .map(UserConverter::toCheckCourse).collect(Collectors.toList()))
+//                .saveCourseList(user.getSaveCourseList().stream()
+//                        .map(UserConverter::toSaveCourse).collect(Collectors.toList()))
+//                .checkCourseList(user.getCheckCourseList().stream()
+//                        .map(UserConverter::toCheckCourse).collect(Collectors.toList()))
                 .build();
 
     }
