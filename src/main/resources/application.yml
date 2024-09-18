@@ -67,3 +67,6 @@ kakao:
   token_uri: "https://kauth.kakao.com" # 토큰 발급 요청 URI
   user_info_uri: "https://kapi.kakao.com" # 사용자 정보 요청 URI
 
+tour_api:
+  service_key: ${Tour_ServiceKey}
+

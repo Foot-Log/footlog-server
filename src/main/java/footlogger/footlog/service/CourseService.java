@@ -1,13 +1,18 @@
 package footlogger.footlog.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import footlogger.footlog.converter.AreaConverter;
 import footlogger.footlog.converter.CourseConverter;
 import footlogger.footlog.converter.NaverBlogConverter;
 import footlogger.footlog.converter.SearchLogConverter;
 import footlogger.footlog.domain.*;
 import footlogger.footlog.repository.*;
+import footlogger.footlog.utils.CourseResponseData;
 import footlogger.footlog.utils.NaverBlog;
 import footlogger.footlog.utils.RecommendSystem;
+import footlogger.footlog.utils.TourApi;
 import footlogger.footlog.web.dto.response.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +45,7 @@ public class CourseService {
     private final LogService logService;
     private final RedisTemplate<String, Long> redisTemplate;
     private final SearchService searchService;
+    private final TourApi tourApi;
 
     //지역기반으로 코스를 받아 옴
     public List<CourseResponseDTO> getByAreaName(String token, Long areaCode) {
@@ -300,5 +306,33 @@ public class CourseService {
                 .map(course -> courseConverter
                         .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
                 .toList();
+    }
+
+    //시군구별 코스 조회
+    public List<CourseResponseDTO> getSigunguCourse(String token, int areaCode, int sigunguCode) {
+        User user = userRepository.findByAccessToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        String jsonResponse = tourApi.getSigunguCourse(areaCode, sigunguCode);
+        System.out.println(jsonResponse);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            CourseResponseData courseResponseData = objectMapper.readValue(jsonResponse, CourseResponseData.class);
+            List<CourseResponseData.Item> items = courseResponseData.getResponse().getBody().getItems().getItem();
+
+            return items.stream()
+                    .map(item -> courseConverter
+                            .jsonToResponse(item,
+                                    saveService.getSaveStatus(Long.parseLong(item.getContentid()), user.getId())))
+                    .toList();
+
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            // JSON 처리 중 발생하는 예외 (파싱 문제 등)
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
     }
 }
