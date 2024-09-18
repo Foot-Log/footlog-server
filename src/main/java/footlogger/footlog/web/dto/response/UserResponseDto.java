@@ -26,8 +26,8 @@ public class UserResponseDto {
         private String profileImg;
         private String level;
         private Long stampCount;
-        private List<SaveCourseDto> saveCourseList;
-        private List<CheckCourseDto> checkCourseList;
+//        private List<SaveCourseDto> saveCourseList;
+//        private List<CheckCourseDto> checkCourseList;
 
     }
 
