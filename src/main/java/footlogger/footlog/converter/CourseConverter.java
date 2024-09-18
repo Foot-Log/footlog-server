@@ -41,6 +41,10 @@ public class CourseConverter {
                 .image(course.getImage())
                 .summary(course.getContent())
                 .address(course.getAddress())
+                .tel(course.getPhoneNum())
+                .telName(course.getPhoneName())
+                .charge(course.getCharge())
+                .homepage(course.getHomepage())
                 .isSave(isSave)
                 .isComplete(isComplete)
                 .build();

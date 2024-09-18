@@ -14,6 +14,9 @@ public class CourseDetailDTO {
     private String summary;
     private String address;
     private String tel;
+    private String telName;
+    private String charge;
+    private String homepage;
     private Boolean isSave;
     private Boolean isComplete;
 }

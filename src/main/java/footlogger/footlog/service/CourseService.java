@@ -314,7 +314,6 @@ public class CourseService {
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         String jsonResponse = tourApi.getSigunguCourse(areaCode, sigunguCode);
-        System.out.println(jsonResponse);
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
