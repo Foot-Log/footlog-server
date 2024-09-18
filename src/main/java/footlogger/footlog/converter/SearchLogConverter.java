@@ -7,10 +7,9 @@ import java.util.List;
 
 public class SearchLogConverter {
 
-    public static SearchLogDTO toDTO(SearchLog searchLog) {
+    public static SearchLogDTO toDTO(String keyword) {
         return SearchLogDTO.builder()
-                .log(searchLog.getLog())
-                .CreatedAt(searchLog.getCreatedAt())
+                .keyword(keyword)
                 .build();
     }
 }

@@ -25,7 +25,7 @@ public class CourseConverter {
         return CourseResponseDTO.builder()
                 .course_id(course.getId())
                 .image(course.getImage())
-                .area(area)
+                .area(course.getAddress())
                 .name(course.getName())
                 .isSave(isSave)
                 .build();
