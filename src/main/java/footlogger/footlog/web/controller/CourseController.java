@@ -167,6 +167,17 @@ public class CourseController {
         return ApiResponse.onSuccess(courseService.getRecentCourse(tokenWithoutBearer));
     }
 
+    @Operation(summary = "시군구 별 코스 조회")
+    @GetMapping(value = "/sigungu")
+    public ApiResponse<List<CourseResponseDTO>> getSigunguCourse(
+            @RequestHeader("Authorization") String token,
+            @RequestParam("area_code") int areaCode,
+            @RequestParam("sigungu_code") int sigunguCode
+    ) {
+        String tokenWithoutBearer = token.substring(7);
+        return ApiResponse.onSuccess(courseService.getSigunguCourse(tokenWithoutBearer, areaCode, sigunguCode));
+    }
+
 //    @Operation( summary = "이미지 업로드 테스트")
 //    @PostMapping(value = "/s3/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 //    public ResponseEntity<?> s3Upload(@RequestParam(value = "image") MultipartFile image) {

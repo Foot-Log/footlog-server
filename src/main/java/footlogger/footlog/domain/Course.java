@@ -41,9 +41,9 @@ public class Course {
     private String phoneName;
     private int areaCode;
     private int sigunguCode;
+    private String charge;
     private String address;
-    private String createdTime;
-    private String modifiedTime;
+    private String homepage;
     //저장된 수
     @Formula("(SELECT COUNT(sc.user_id) FROM save_course sc WHERE sc.course_id = course_id)")
     private int totalSaves;

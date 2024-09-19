@@ -1,9 +1,11 @@
 package footlogger.footlog.converter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import footlogger.footlog.domain.Course;
 import footlogger.footlog.domain.CourseImage;
 import footlogger.footlog.service.CourseService;
 import footlogger.footlog.service.SaveService;
+import footlogger.footlog.utils.CourseResponseData;
 import footlogger.footlog.web.dto.response.CourseDetailDTO;
 import footlogger.footlog.web.dto.response.CourseResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +41,24 @@ public class CourseConverter {
                 .image(course.getImage())
                 .summary(course.getContent())
                 .address(course.getAddress())
+                .tel(course.getPhoneNum())
+                .telName(course.getPhoneName())
+                .charge(course.getCharge())
+                .homepage(course.getHomepage())
                 .isSave(isSave)
                 .isComplete(isComplete)
                 .build();
     }
-}
+
+    public CourseResponseDTO jsonToResponse(CourseResponseData.Item item, Boolean isSave) {
+
+        return CourseResponseDTO.builder()
+                .course_id(Long.parseLong(item.getContentid()))
+                .image(item.getMainimage())
+                .area(item.getAddr())
+                .name(item.getTitle())
+                .isSave(isSave)
+                .build();
+        }
+    }
+
