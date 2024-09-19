@@ -168,14 +168,13 @@ public class CourseController {
     }
 
     @Operation(summary = "시군구 별 코스 조회")
-    @GetMapping(value = "/sigungu")
+    @GetMapping(value = "/sigungu/{sigungu_id}")
     public ApiResponse<List<CourseResponseDTO>> getSigunguCourse(
             @RequestHeader("Authorization") String token,
-            @RequestParam("area_code") int areaCode,
-            @RequestParam("sigungu_code") int sigunguCode
+            @PathVariable("sigungu_id") Long sigunguId
     ) {
         String tokenWithoutBearer = token.substring(7);
-        return ApiResponse.onSuccess(courseService.getSigunguCourse(tokenWithoutBearer, areaCode, sigunguCode));
+        return ApiResponse.onSuccess(courseService.getSigunguCourse(tokenWithoutBearer, sigunguId));
     }
 
 //    @Operation( summary = "이미지 업로드 테스트")

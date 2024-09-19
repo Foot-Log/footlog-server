@@ -71,10 +71,12 @@ public class AreaConverter {
     }
 
     public SigunguCodeDTO getSigunguCodeDTOByCodes(Sigungu sigungu) {
+        String areaName = getAreaNameByCode(sigungu.getAreaCode());
+
         return SigunguCodeDTO.builder()
-                .areaCode(sigungu.getAreaCode())
-                .sigunguCode(sigungu.getSigunguCode())
+                .sigunguId(sigungu.getId())
                 .sigunguName(sigungu.getSigunguName())
+                .withArea(areaName + " " + sigungu.getSigunguName())
                 .build();
     }
 }

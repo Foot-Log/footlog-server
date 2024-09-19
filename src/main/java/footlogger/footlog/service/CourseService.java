@@ -46,6 +46,7 @@ public class CourseService {
     private final RedisTemplate<String, Long> redisTemplate;
     private final SearchService searchService;
     private final TourApi tourApi;
+    private final SigunguRepository sigunguRepository;
 
     //지역기반으로 코스를 받아 옴
     public List<CourseResponseDTO> getByAreaName(String token, Long areaCode) {
@@ -309,9 +310,15 @@ public class CourseService {
     }
 
     //시군구별 코스 조회
-    public List<CourseResponseDTO> getSigunguCourse(String token, int areaCode, int sigunguCode) {
+    public List<CourseResponseDTO> getSigunguCourse(String token, Long sigunguId) {
         User user = userRepository.findByAccessToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        Sigungu sigungu = sigunguRepository.findById(sigunguId)
+                .orElseThrow(() -> new IllegalArgumentException("시군구를 찾을 수 없습니다."));
+
+        int areaCode = sigungu.getAreaCode();
+        int sigunguCode = sigungu.getSigunguCode();
 
         String jsonResponse = tourApi.getSigunguCourse(areaCode, sigunguCode);
         ObjectMapper objectMapper = new ObjectMapper();
