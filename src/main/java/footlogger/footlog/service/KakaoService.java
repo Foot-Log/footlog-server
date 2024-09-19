@@ -186,7 +186,7 @@ public class KakaoService {
                     .nickname(userInfo.getKakaoAccount().getProfile().getNickName())
                     .profileImg(userInfo.getKakaoAccount().getProfile().getProfileImageUrl())
                     .email(userInfo.getKakaoAccount().getEmail())
-                    .level("새싹")
+                    .level("새싹 플로거")
                     .stampCount(0L)
                     .build(); // 회원가입 처리 로직 추가
 
