@@ -132,8 +132,16 @@ public class CourseService {
                 .course(course)
                 .user(user)
                 .build();
+        logRepository.save(log);
 
-        return logRepository.save(log).getId();
+        long currentStampCount = user.getStampCount() != null ? user.getStampCount() : 0;
+        long updatedStampCount = currentStampCount + 1;
+
+        user.setStampCount(updatedStampCount);
+        userRepository.save(user);
+
+        return log.getId();
+
     }
 
     //플라스크 서버로 분석요청 보낸 후 코스id 받아옴

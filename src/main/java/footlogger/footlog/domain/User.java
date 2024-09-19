@@ -41,4 +41,8 @@ public class User {
     private String refreshToken;
     @Setter
     private String accessToken;
+
+    public void setStampCount(long stampCount) {
+        this.stampCount = stampCount;
+    }
 }
