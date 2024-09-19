@@ -9,17 +9,33 @@ import java.util.stream.Collectors;
 
 public class UserConverter {
     public static UserResponseDto.UserInfoDto toUserInfo(User user) {
+        long currentStampCount = user.getStampCount() != null ? user.getStampCount() : 0;
+
+        String levelName = getLevelName(currentStampCount);
+
+        long stampsInCurrentLevel = (currentStampCount - 1) % 5 + 1;
+
         return UserResponseDto.UserInfoDto.builder()
                 .kakaoId(user.getKakaoId())
                 .nickname(user.getNickname())
-                .level(user.getLevel())
-                .stampCount(user.getStampCount())
+                .level(levelName)
+                .stampCount(stampsInCurrentLevel)
                 .profileImg(user.getProfileImg())
-//                .saveCourseList(user.getSaveCourseList().stream()
-//                        .map(UserConverter::toSaveCourse).collect(Collectors.toList()))
-//                .checkCourseList(user.getCheckCourseList().stream()
-//                        .map(UserConverter::toCheckCourse).collect(Collectors.toList()))
                 .build();
+    }
+
+    public static String getLevelName(long stampCount){
+        if (stampCount <= 5) {
+            return "새싹 플로거";
+        } else if (stampCount <= 10) {
+            return "초보 플로거";
+        } else if (stampCount <= 15) {
+            return "중수 플로거";
+        } else if (stampCount <= 20) {
+            return "고수 플로거";
+        } else {
+            return "베스트 플로거";
+        }
 
     }
     public static UserResponseDto.SaveCourseDto toSaveCourse(SaveCourse saveCourse) {
