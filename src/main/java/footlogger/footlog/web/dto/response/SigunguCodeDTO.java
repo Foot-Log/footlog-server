@@ -6,7 +6,7 @@ import lombok.Getter;
 @Builder
 @Getter
 public class SigunguCodeDTO {
-    private int sigunguCode;
-    private int areaCode;
+    private Long sigunguId;
     private String sigunguName;
+    private String withArea;
 }
