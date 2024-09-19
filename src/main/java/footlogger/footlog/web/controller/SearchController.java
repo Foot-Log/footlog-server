@@ -1,6 +1,7 @@
 package footlogger.footlog.web.controller;
 
 import footlogger.footlog.payload.ApiResponse;
+import footlogger.footlog.payload.code.status.ErrorStatus;
 import footlogger.footlog.repository.CourseRepository;
 import footlogger.footlog.service.AreaService;
 import footlogger.footlog.service.CourseService;
@@ -12,8 +13,13 @@ import footlogger.footlog.web.dto.response.SigunguCodeDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -43,9 +49,19 @@ public class SearchController {
             @PathVariable(value = "keyword") String keyword
     ) {
         String tokenWithoutBearer = token.substring(7);
-        return ApiResponse.onSuccess(CourseCountDTO.builder()
-                        .Count(searchService.deleteRecentSearchLog(tokenWithoutBearer, keyword))
-                .build());
+
+        try {
+            String decodedKeyword = URLDecoder.decode(keyword, "UTF-8");
+
+            return ApiResponse.onSuccess(CourseCountDTO.builder()
+                    .Count(searchService.deleteRecentSearchLog(tokenWithoutBearer, decodedKeyword))
+                    .build());
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+
+            return ApiResponse.onFailure(ErrorStatus._BAD_REQUEST, CourseCountDTO.builder().build());
+        }
     }
 
     @Operation(summary = "코스 검색")
@@ -55,7 +71,18 @@ public class SearchController {
             @PathVariable(value = "keyword") String keyword
     ) {
         String tokenWithoutBearer = token.substring(7);
-        return ApiResponse.onSuccess(courseService.getCourseByKeyword(tokenWithoutBearer, keyword));
+
+        try {
+            String decodedKeyword = URLDecoder.decode(keyword, "UTF-8");
+
+            return ApiResponse.onSuccess(courseService.getCourseByKeyword(tokenWithoutBearer, decodedKeyword));
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return ApiResponse.onFailure(ErrorStatus._BAD_REQUEST, Arrays.asList(CourseResponseDTO.builder().build()));
+        }
+
+
     }
 
     @Operation(summary = "시군구 정보 전체 조회")
