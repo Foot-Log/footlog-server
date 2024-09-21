@@ -16,21 +16,21 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findAllByIdIn(List<Long> ids);
 
     //지역 코드에 맞게 코스들을 저장수 순으로 불러옴
-    @Query("SELECT c FROM Course c WHERE c.areaCode = :areaCode ORDER BY c.totalSaves")
+    @Query("SELECT c FROM Course c WHERE c.areaCode = :areaCode ORDER BY c.totalSaves DESC")
     List<Course> findByAreaCode(@Param("areaCode") Long areaCode);
 
-    @Query("SELECT c FROM Course c ORDER BY c.totalSaves LIMIT :total")
+    @Query("SELECT c FROM Course c ORDER BY c.totalSaves DESC LIMIT :total")
     List<Course> findAllOrderByTotalSaves(@Param("total") Integer total);
 
     //검색어와 이름이 매칭되는 코스 불러오기
-    @Query("SELECT c FROM Course c WHERE c.name LIKE %:keyword% ORDER BY c.totalSaves LIMIT :limit")
+    @Query("SELECT c FROM Course c WHERE c.name LIKE %:keyword% ORDER BY c.totalSaves DESC LIMIT :limit")
     List<Course> findByNameKeyword(@Param("keyword") String keyword, @Param("limit") Integer limit);
 
     //검색어와 주소가 매칭되는 코스 불러오기
-    @Query("SELECT c FROM Course c WHERE c.address LIKE %:keyword% ORDER BY c.totalSaves LIMIT :limit")
+    @Query("SELECT c FROM Course c WHERE c.address LIKE %:keyword% ORDER BY c.totalSaves DESC LIMIT :limit")
     List<Course> findByAddressKeyword(@Param("keyword") String keyword, @Param("limit") Integer limit);
 
     //검색어와 내용가 매칭되는 코스 불러오기
-    @Query("SELECT c FROM Course c WHERE c.content LIKE %:keyword% ORDER BY c.totalSaves LIMIT :limit")
+    @Query("SELECT c FROM Course c WHERE c.content LIKE %:keyword% ORDER BY c.totalSaves DESC LIMIT :limit")
     List<Course> findByContentKeyword(@Param("keyword") String keyword, @Param("limit") Integer limit);
 }
