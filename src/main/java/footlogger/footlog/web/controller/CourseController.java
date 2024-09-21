@@ -2,6 +2,7 @@ package footlogger.footlog.web.controller;
 
 import footlogger.footlog.converter.AreaConverter;
 import footlogger.footlog.payload.ApiResponse;
+import footlogger.footlog.payload.code.status.ErrorStatus;
 import footlogger.footlog.service.AreaService;
 import footlogger.footlog.service.CourseService;
 import footlogger.footlog.service.S3ImageService;
@@ -64,7 +65,12 @@ public class CourseController {
             @RequestHeader("Authorization") String token
     ) {
         String tokenWithoutBearer = token.substring(7);
-        return ApiResponse.onSuccess(courseService.getRecommendCourse(tokenWithoutBearer));
+        List<CourseResponseDTO> recommendCourses = courseService.getRecommendCourse(tokenWithoutBearer);
+
+        if (recommendCourses.isEmpty())
+            return ApiResponse.onFailure(ErrorStatus._NOANALISYS, recommendCourses);
+        else
+            return ApiResponse.onSuccess(recommendCourses);
     }
 
     @Operation(summary = "코스 클릭 시 상세 정보 조회")
