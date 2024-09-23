@@ -16,7 +16,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findAllByIdIn(List<Long> ids);
 
     //지역 코드에 맞게 코스들을 저장수 순으로 불러옴
-    @Query("SELECT c FROM Course c WHERE c.areaCode = :areaCode ORDER BY c.totalSaves DESC")
+    @Query("SELECT c FROM Course c WHERE c.areaCode = :areaCode ORDER BY c.name")
     List<Course> findByAreaCode(@Param("areaCode") Long areaCode);
 
     @Query("SELECT c FROM Course c ORDER BY c.totalSaves DESC LIMIT :total")
