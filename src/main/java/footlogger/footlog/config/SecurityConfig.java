@@ -56,7 +56,7 @@ public class SecurityConfig {
 public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setMaxAge(3600L);
-    configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+    configuration.setAllowedOrigins(List.of("https://localhost:3000", "https://footlog.site", "https://www.footlog.site/user/kakao/callback"));
 
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of(AUTHORIZATION, CONTENT_TYPE, CONTENT_DISPOSITION));
