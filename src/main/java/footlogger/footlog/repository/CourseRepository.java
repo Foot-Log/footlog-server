@@ -19,18 +19,18 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("SELECT c FROM Course c WHERE c.areaCode = :areaCode ORDER BY c.name")
     List<Course> findByAreaCode(@Param("areaCode") Long areaCode);
 
-    @Query("SELECT c FROM Course c ORDER BY c.totalSaves DESC LIMIT :total")
+    @Query("SELECT c FROM Course c ORDER BY c.name LIMIT :total")
     List<Course> findAllOrderByTotalSaves(@Param("total") Integer total);
 
     //검색어와 이름이 매칭되는 코스 불러오기
-    @Query("SELECT c FROM Course c WHERE c.name LIKE %:keyword% ORDER BY c.totalSaves DESC LIMIT :limit")
+    @Query("SELECT c FROM Course c WHERE c.name LIKE %:keyword% ORDER BY c.name DESC LIMIT :limit")
     List<Course> findByNameKeyword(@Param("keyword") String keyword, @Param("limit") Integer limit);
 
     //검색어와 주소가 매칭되는 코스 불러오기
-    @Query("SELECT c FROM Course c WHERE c.address LIKE %:keyword% ORDER BY c.totalSaves DESC LIMIT :limit")
+    @Query("SELECT c FROM Course c WHERE c.address LIKE %:keyword% ORDER BY c.name DESC LIMIT :limit")
     List<Course> findByAddressKeyword(@Param("keyword") String keyword, @Param("limit") Integer limit);
 
     //검색어와 내용가 매칭되는 코스 불러오기
-    @Query("SELECT c FROM Course c WHERE c.content LIKE %:keyword% ORDER BY c.totalSaves DESC LIMIT :limit")
+    @Query("SELECT c FROM Course c WHERE c.content LIKE %:keyword% ORDER BY c.name DESC LIMIT :limit")
     List<Course> findByContentKeyword(@Param("keyword") String keyword, @Param("limit") Integer limit);
 }
