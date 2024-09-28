@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.Map;
 
 import static footlogger.footlog.payload.code.status.ErrorStatus._INTERNAL_SERVER_ERROR;
@@ -33,7 +34,10 @@ public class UserController {
     @GetMapping("/kakao/callback")
     public ApiResponse<UserResponseDto.LoginResultDto> callback(@RequestParam("code") String code, @RequestParam("redirect_uri") String redirectUri) throws IOException {
         try {
-            KakaoTokenResponseDto kakaoTokenResponseDto = kakaoService.getAccessTokenFromKakao(code, redirectUri);
+
+            String decodedUri = URLDecoder.decode(redirectUri, "UTF-8");
+
+            KakaoTokenResponseDto kakaoTokenResponseDto = kakaoService.getAccessTokenFromKakao(code, decodedUri);
             KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(kakaoTokenResponseDto.getAccessToken());
 //
             UserResponseDto.LoginResultDto loginResultDto = kakaoService.handleUserLogin(userInfo);
