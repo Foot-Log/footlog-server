@@ -8,6 +8,7 @@ import footlogger.footlog.web.dto.response.KakaoTokenResponseDto;
 import footlogger.footlog.web.dto.response.KakaoUserInfoResponseDto;
 import footlogger.footlog.web.dto.response.UserResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,9 +31,9 @@ public class UserController {
     @CrossOrigin("*")
     @Operation(summary = "카카오 로그인 및 회원 가입")
     @GetMapping("/kakao/callback")
-    public ApiResponse<UserResponseDto.LoginResultDto> callback(@RequestParam("code") String code) {
+    public ApiResponse<UserResponseDto.LoginResultDto> callback(@RequestParam("code") String code, @RequestParam("redirect_uri") String redirectUri) throws IOException {
         try {
-            KakaoTokenResponseDto kakaoTokenResponseDto = kakaoService.getAccessTokenFromKakao(code);
+            KakaoTokenResponseDto kakaoTokenResponseDto = kakaoService.getAccessTokenFromKakao(code, redirectUri);
             KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(kakaoTokenResponseDto.getAccessToken());
 //
             UserResponseDto.LoginResultDto loginResultDto = kakaoService.handleUserLogin(userInfo);

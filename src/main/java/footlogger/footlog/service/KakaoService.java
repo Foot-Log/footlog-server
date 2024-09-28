@@ -35,8 +35,9 @@ public class KakaoService {
     @Value("${kakao.client_id}")
     private String clientId;
 
-    @Value("${kakao.redirect_uri}")
-    private String redirectUri;
+    //개발 할때까지만 잠시 주석처리!
+//    @Value("${kakao.redirect_uri}")
+//    private String redirectUri;
 
     @Value("${kakao.token_uri}")
     private String tokenUri;
@@ -76,13 +77,14 @@ public class KakaoService {
 //            throw new RuntimeException("Failed to retrieve access token from Kakao", e);
 //        }
 //    }
-    public KakaoTokenResponseDto getAccessTokenFromKakao(String code) {
+    public KakaoTokenResponseDto getAccessTokenFromKakao(String code, String redirectUri) {
         try {
             RestTemplate restTemplate = new RestTemplate();
             String uri = UriComponentsBuilder.fromUriString(tokenUri)
                     .path("/oauth/token")
                     .queryParam("grant_type", "authorization_code")
                     .queryParam("client_id", clientId)
+                    //현재 개발 상황으로 인해 환경변수가 아닌 프론트에게 직접 uri를 받음 개발 완료되면 변경 필요
                     .queryParam("redirect_uri", redirectUri)
                     .queryParam("code", code)
                     .toUriString();
