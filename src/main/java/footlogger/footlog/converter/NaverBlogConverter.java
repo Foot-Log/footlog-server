@@ -24,7 +24,7 @@ public class NaverBlogConverter {
             return null;
         }
         // <b>와 </b> 태그만 제거
-        return input.replaceAll("</?b>", "");
+        return input.replaceAll("</?b>", "").replaceAll("&[^;]+;", "");
     }
 
 }

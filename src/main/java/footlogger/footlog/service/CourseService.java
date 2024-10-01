@@ -226,7 +226,7 @@ public class CourseService {
         User user = userRepository.findByAccessToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
-        return courseRepository.findAllOrderByTotalSaves(10).stream()
+        return courseRepository.findCourseOrderByImage(10).stream()
                 .map(course -> courseConverter
                         .toResponseDTO(course, saveService.getSaveStatus(course.getId(), user.getId())))
                 .toList();
