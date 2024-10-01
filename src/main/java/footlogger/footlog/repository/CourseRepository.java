@@ -22,6 +22,9 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("SELECT c FROM Course c ORDER BY c.name LIMIT :total")
     List<Course> findAllOrderByTotalSaves(@Param("total") Integer total);
 
+    @Query("SELECT c FROM Course c ORDER BY c.image DESC LIMIT :total")
+    List<Course> findCourseOrderByImage(@Param("total") Integer total);
+
     //검색어와 이름이 매칭되는 코스 불러오기
     @Query("SELECT c FROM Course c WHERE c.name LIKE %:keyword% ORDER BY c.name DESC LIMIT :limit")
     List<Course> findByNameKeyword(@Param("keyword") String keyword, @Param("limit") Integer limit);
